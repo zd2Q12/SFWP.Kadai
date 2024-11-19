@@ -27,4 +27,13 @@ CREATE TABLE vote_items (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (created_by) REFERENCES users(user_id)  -- 外部キー制約
 );
+CREATE TABLE vote_results (
+    vote_result_id INT AUTO_INCREMENT PRIMARY KEY,  -- 結果ID
+    user_id INT NOT NULL,                           -- ユーザーID
+    vote_item_id INT NOT NULL,                      -- 投票アイテムID
+    voted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,   -- 投票日時
+    FOREIGN KEY (user_id) REFERENCES users(user_id),     -- 外部キー: ユーザーID
+    FOREIGN KEY (vote_item_id) REFERENCES vote_items(vote_item_id),  -- 外部キー: 投票アイテムID
+    CONSTRAINT unique_vote UNIQUE (user_id, vote_item_id)  -- ユーザーと投票アイテムの組み合わせを一意にする
+);
 
