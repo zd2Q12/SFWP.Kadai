@@ -6,6 +6,14 @@
 		select * from users where user_id = #{userId}
 	</select>
 	
+	<select id="getUserByName" resultType="User">
+	select * from users where user_name = #{userName}
+	</select>
+	
+	<select id="selectAll" resultType="User">
+	select * from users
+	</select>
+	
 	<insert id="addUser" parameterType="User">
 	insert into users(user_name, password, email, birthday, memo, created_at)
 	values(#{userName}, #{password}, #{email}, #{birthday}, #{memo}, now())
@@ -19,6 +27,6 @@
 	</update>
 	
 	<delete id="deleteUser" parameterType="User">
-	delete from users where id = #{id}
+	delete from users where user_id = #{userId}
 	</delete>
 </mapper>
