@@ -10,7 +10,7 @@ import com.example.app.domain.User;
 public interface UserMapper {
 //CRUD処理
 	//管理者用
-	List<User> selectUsers();
+	List<User> selectAll();
 	
 	//個別取得　（Read）
 	User getUserById(int id);//IDに対応するUserを取得・表示する
