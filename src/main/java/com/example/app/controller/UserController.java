@@ -4,6 +4,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.app.domain.User;
 import com.example.app.mapper.UserMapper;
@@ -17,6 +18,39 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 
 	private final UserMapper userMapper;
+	
+	//ログインページ
+	@GetMapping("/login")
+	public String loginPage() {
+		return "login";//ログインページへ
+	}
+	
+	//ログイン
+	@PostMapping("/login")
+	public String login(
+			@RequestParam String userName,
+			@RequestParam String password,
+			Model model
+			) {
+		//ユーザー名とパスワードでユーザーを取得
+		User user = userMapper.getUserByName(userName);
+		
+		if(user != null &&user.getPassword().equals(password)) {
+      //認証OK-＞セッションに保存
+			model.addAttribute("user", user);
+			return "redirect://home";//ログインしたらHOMEページへリダイレクト
+		}else {
+			//認証失敗　エラーメッセージを出す
+			model.addAttribute("message", "ユーザー名またはパスワードが間違っています");
+			return "login";//ログインページを再表示
+		}
+	}
+	
+	//Homeページへ
+	@GetMapping("/home")
+	public String homePage(Model model) {
+		return "home";
+	}
 	
 	
 	//新規ユーザー登録ページを表示
