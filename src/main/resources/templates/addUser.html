@@ -7,21 +7,25 @@
 <body>
 <h2>新規ユーザー登録</h2>
 <form action="" method="post" th:object="${user}">
-	<label for="userName">ユーザー名：</label>
+	<p><label for="userName">ユーザー名：</label>
 	<input type="text" th:field="*{userName}">
-	
+	</p>
+	<p>
 	<label for="password">パスワード：</label>
 	<input type="password" th:field="*{password}">
-	
+	</p>
+	<p>
 	<label for="email">メールアドレス：</label>
 	<input type="email" th:field="*{email}">
-	
+	</p>
+	<p>
 	<label for="birthday">誕生日：</label>
 	<input type="date" th:field="*{birthday}">
-	
+	</p>
+	<p>
 	<label for="memo">メモ：</label>
 	<textarea th:field="*{memo}" cols="30" rows="10"></textarea>
-
+</p>
 	<button type="button">登録</button>
 </form>
 
