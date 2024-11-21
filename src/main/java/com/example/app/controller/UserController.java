@@ -33,12 +33,12 @@ public class UserController {
 			Model model
 			) {
 		//ユーザー名とパスワードでユーザーを取得
-		User user = userMapper.getUserByName(userName);
+		User user = userMapper.getUserByUserNameAndPassword(userName, password);
 		
 		if(user != null &&user.getPassword().equals(password)) {
       //認証OK-＞セッションに保存
 			model.addAttribute("user", user);
-			return "redirect://home";//ログインしたらHOMEページへリダイレクト
+			return "redirect:/home";//ログインしたらHOMEページへリダイレクト
 		}else {
 			//認証失敗　エラーメッセージを出す
 			model.addAttribute("message", "ユーザー名またはパスワードが間違っています");
