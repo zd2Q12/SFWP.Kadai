@@ -15,80 +15,85 @@ import com.example.app.mapper.UserMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-
-
 @Controller
 @RequiredArgsConstructor
 public class UserController {
 
 	private final UserMapper userMapper;
-	
+
 	//ログインページ
 	@GetMapping("/login")
 	public String loginPage(
-			Model model
-			) {
-		 // 新しいUserオブジェクトをモデルに追加
+			Model model) {
+		// 新しいUserオブジェクトをモデルに追加
 		model.addAttribute("user", new User());
 		return "login";//ログインページへ
 	}
-	
+
 	//ログイン
 	@PostMapping("/login")
 	public String login(
-		// Userオブジェクトをフォームから受け取る
+			// Userオブジェクトをフォームから受け取る
 			@Valid User user,
 			Errors errors,
-			Model model
-			) {
+			Model model) {
 		//ユーザー名とパスワードでユーザーを取得
 		User foundUser = userMapper.getUserByUserNameAndPassword(user.getUserName(), user.getPassword());
-		if(errors.hasErrors()) {
+		
+		if (errors.hasErrors()) {
 			//エラー内容の補足
 			List<ObjectError> objList = errors.getAllErrors();
-			for(ObjectError obj : objList) {
+			for (ObjectError obj : objList) {
 				System.out.println(obj.toString());
 			}
 			return "login";
-			
-		}else {
+
+		} else {
 			//認証OK-＞セッションに保存
 			model.addAttribute("user", foundUser);
 			return "redirect:/home";//ログインしたらHOMEページへリダイレクト
-			
+
 		}
 
 	}
-	
+
 	//Homeページへ
 	@GetMapping("/home")
 	public String homePage(Model model) {
 		return "home";
 	}
-	
-	
+
 	//新規ユーザー登録ページを表示
 	@GetMapping("/addUser")
 	public String addUserGet(Model model) {
 		model.addAttribute("user", new User());//空のUserオブジェクト
 		return "addUser";
 	}
-	
+
 	//新規ユーザー登録
 	@PostMapping("/adduser")
-	public String adduserPost(User user, Model model) {
-		//新規追加処理
-		userMapper.addUser(user);
-		model.addAttribute("message", "ユーザー登録完了");
+	public String adduserPost(
+			@Valid User user,
+			Errors errors,
+			Model model) {
 		
-		return "login";//登録完了後はログインページに遷移
-	}
-	
-	
+		//エラーがあれば、エラーメッセージを表示
+		if (errors.hasErrors()) {
+			//エラー内容の補足
+			List<ObjectError> objList = errors.getAllErrors();
+			for (ObjectError obj : objList) {
+				System.out.println(obj.toString());
+			}
+			return "redirect:/addUser";//登録ページに戻る
+		} else {
+			//新規追加処理
+			userMapper.addUser(user);
+			model.addAttribute("message", "ユーザー登録完了");
 
-	
-	
-	//ユーザー追加
+			return "login";//登録完了後はログインページに遷移
+		}
+	}
+
 
 	//ユーザーの削除
 }
