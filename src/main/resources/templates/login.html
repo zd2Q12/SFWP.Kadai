@@ -9,22 +9,21 @@
 <body>
 	<h2>login</h2>
 	<form action="" method="post" th:object="${user}">
+		<p class="error" th:errors="*{userName}"></p>
 		<p>
 			<input type="text" th:field="*{userName}" placeholder="ユーザー名">
 		</p>
+		<p class="error" th:errors="*{password}"></p>
 		<p>
 			<input type="password" th:field="*{password}" placeholder="パスワード">
 		</p>
 		<p>
 			<input type="submit" value="ログイン">
 		</p>
-		<div th:if="${message != null}">
-			<p th:text="${message}"></p>
-		</div>
-
+	
 		<h2>新規登録</h2>
 	</form>
-		<a th:href="@{/addUser}">新規登録がまだの方はこちら</a>
+	<a th:href="@{/addUser}">新規登録がまだの方はこちら</a>
 </body>
 
 </html>
