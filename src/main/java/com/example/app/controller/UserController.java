@@ -1,14 +1,18 @@
 package com.example.app.controller;
 
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.Errors;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import com.example.app.domain.User;
 import com.example.app.mapper.UserMapper;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 
@@ -33,22 +37,27 @@ public class UserController {
 	@PostMapping("/login")
 	public String login(
 		// Userオブジェクトをフォームから受け取る
-			@ModelAttribute("user") User user,
+			@Valid User user,
+			Errors errors,
 			Model model
 			) {
 		//ユーザー名とパスワードでユーザーを取得
 		User foundUser = userMapper.getUserByUserNameAndPassword(user.getUserName(), user.getPassword());
-		
-		if(user != null &&user.getPassword().equals(user.getPassword())) {
-      //認証OK-＞セッションに保存
+		if(errors.hasErrors()) {
+			//エラー内容の補足
+			List<ObjectError> objList = errors.getAllErrors();
+			for(ObjectError obj : objList) {
+				System.out.println(obj.toString());
+			}
+			return "login";
+			
+		}else {
+			//認証OK-＞セッションに保存
 			model.addAttribute("user", foundUser);
 			return "redirect:/home";//ログインしたらHOMEページへリダイレクト
-		}else {
-			//認証失敗　エラーメッセージを出す
-			model.addAttribute("message", "ユーザー名またはパスワードが間違っています");
-			model.addAttribute("user", user);
-			return "login";//ログインページを再表示
+			
 		}
+
 	}
 	
 	//Homeページへ
