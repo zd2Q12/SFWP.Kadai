@@ -2,6 +2,7 @@ package com.example.app.domain;
 
 import java.sql.Date;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.example.app.validation.AddUserGroup;
 import com.example.app.validation.LoginGroup;
@@ -37,4 +38,10 @@ public class User {
 	private Date birthday;
 	private String memo;
 	private LocalDateTime createdAt;
+
+	//ユーザーに対しユーザー投稿 1対多　多対多
+	public List<VoteItem> votes;
+	
+	//ユーザー、ユーザー投稿に対し、投稿結果　1対多　多対多
+	public List<VoteResult> results;
 }
