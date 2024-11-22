@@ -3,6 +3,9 @@ package com.example.app.domain;
 import java.sql.Date;
 import java.time.LocalDateTime;
 
+import com.example.app.validation.AddUserGroup;
+import com.example.app.validation.LoginGroup;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -14,20 +17,22 @@ import lombok.Data;
 public class User {
 
 	private Integer userId;
-	
-	@NotBlank
-	@Size(min=5, max=50)
+	//未入力＝会員登録時・ログイン時
+	@NotBlank(groups = {LoginGroup.class, AddUserGroup.class})
+	//文字数＝会員登録時
+	@Size(min=5, max=50, groups = {AddUserGroup.class})
 	private String userName;
 	
-	@NotNull
-	@Size(min=5, max=60)
+	//未入力＝会員登録時・ログイン時
+	@NotBlank(groups = {LoginGroup.class, AddUserGroup.class})
+	@Size(min=5, max=60, groups = {AddUserGroup.class})
 	private String password;
 	
 	@Email
 	private String email;
 	
-	@NotNull
-	@Past
+	@NotNull(groups = {AddUserGroup.class})
+	@Past(groups = {AddUserGroup.class})
 	private Date birthday;
 	private String memo;
 	private LocalDateTime createdAt;
