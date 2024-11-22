@@ -3,6 +3,8 @@ package com.example.app.domain;
 import java.sql.Date;
 import java.time.LocalDateTime;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import com.example.app.validation.AddUserGroup;
 import com.example.app.validation.LoginGroup;
 
@@ -33,6 +35,7 @@ public class User {
 	
 	@NotNull(groups = {AddUserGroup.class})
 	@Past(groups = {AddUserGroup.class})
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date birthday;
 	private String memo;
 	private LocalDateTime createdAt;
