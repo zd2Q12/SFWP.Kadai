@@ -15,6 +15,9 @@ import com.example.app.mapper.UserMapper;
 import com.example.app.validation.AddUserGroup;
 import com.example.app.validation.LoginGroup;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -23,6 +26,21 @@ public class UserController {
 
 	private final UserMapper userMapper;
 
+	
+	//Homeページへ
+	@GetMapping("/home")
+	public String homePage(Model model) {
+		//ほかのユーザーの投票の投稿見る、投票する、投票結果見る
+		return "home";
+	}
+	
+	@PostMapping("/home")
+	public String home() {
+		//投票の新規作成・変更更新・削除
+		//
+		return "";
+	}
+	
 	//ログインページ
 	@GetMapping("/login")
 	public String loginPage(
@@ -38,10 +56,13 @@ public class UserController {
 			// Userオブジェクトをフォームから受け取る
 			@Validated(LoginGroup.class) User user,
 			Errors errors,
-			Model model) {
+			Model model,
+			HttpServletRequest request,
+			HttpServletResponse response
+			) {
 		//ユーザー名とパスワードでユーザーを取得
 		User foundUser = userMapper.getUserByUserNameAndPassword(user.getUserName(), user.getPassword());
-		
+		// 入力エラーがあれば、ログインページに戻る
 		if (errors.hasErrors()) {
 			//エラー内容の補足
 			List<ObjectError> objList = errors.getAllErrors();
@@ -52,23 +73,20 @@ public class UserController {
 
 		} else {
 			//認証OK-＞セッションに保存
-			model.addAttribute("user", foundUser);
-			return "redirect:/home";//ログインしたらHOMEページへリダイレクト
-
+				HttpSession session = request.getSession();
+				session.setAttribute("user", foundUser);//セッションにユーザー情報を格納
+				//model.addAttribute("user", foundUser);
+				return "redirect:/home";//ログインしたらHOMEページへリダイレクト
+			}//homeは
 		}
+	
 
-	}
 
-	//Homeページへ
-	@GetMapping("/home")
-	public String homePage(Model model) {
-		return "home";
-	}
 
 	//新規ユーザー登録ページを表示
 	@GetMapping("/addUser")
 	public String addUserGet(Model model) {
-	//thymeleafの方でドメインクラスを使えるように
+		//thymeleafの方でドメインクラスを使えるように
 		model.addAttribute("user", new User());//空のUserオブジェクト
 		return "addUser";
 	}
@@ -78,8 +96,7 @@ public class UserController {
 	public String addUserPost(
 			@Validated(AddUserGroup.class) User user,
 			Errors errors,
-			Model model
-			) {
+			Model model) {
 		//エラーがあれば、エラーメッセージを表示
 		if (errors.hasErrors()) {
 			//エラー内容の補足
@@ -94,9 +111,8 @@ public class UserController {
 			model.addAttribute("message", "ユーザー登録完了");
 
 			return "redirect:/login";//登録完了後はログインページに遷移
-		}
+		}//VoteControllerのhomeにリダイレクト
 	}
-
 
 	//ユーザーの削除
 }
