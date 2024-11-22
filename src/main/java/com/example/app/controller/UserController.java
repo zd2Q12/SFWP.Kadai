@@ -74,8 +74,8 @@ public class UserController {
 	}
 
 	//新規ユーザー登録
-	@PostMapping("/adduser")
-	public String adduserPost(
+	@PostMapping("/addUser")
+	public String addUserPost(
 			@Validated(AddUserGroup.class) User user,
 			Errors errors,
 			Model model
@@ -87,13 +87,13 @@ public class UserController {
 			for (ObjectError obj : objList) {
 				System.out.println(obj.toString());
 			}
-			return "redirect:/addUser";//登録ページに戻る
+			return "addUser";//エラーがあった場合、登録ページに戻る
 		} else {
 			//新規追加処理
 			userMapper.addUser(user);
 			model.addAttribute("message", "ユーザー登録完了");
 
-			return "login";//登録完了後はログインページに遷移
+			return "redirect:/login";//登録完了後はログインページに遷移
 		}
 	}
 
