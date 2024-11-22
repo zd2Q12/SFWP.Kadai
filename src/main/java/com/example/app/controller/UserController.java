@@ -6,13 +6,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import com.example.app.domain.User;
 import com.example.app.mapper.UserMapper;
+import com.example.app.validation.AddUserGroup;
+import com.example.app.validation.LoginGroup;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -34,7 +36,7 @@ public class UserController {
 	@PostMapping("/login")
 	public String login(
 			// Userオブジェクトをフォームから受け取る
-			@Valid User user,
+			@Validated(LoginGroup.class) User user,
 			Errors errors,
 			Model model) {
 		//ユーザー名とパスワードでユーザーを取得
@@ -66,6 +68,7 @@ public class UserController {
 	//新規ユーザー登録ページを表示
 	@GetMapping("/addUser")
 	public String addUserGet(Model model) {
+	//thymeleafの方でドメインクラスを使えるように
 		model.addAttribute("user", new User());//空のUserオブジェクト
 		return "addUser";
 	}
@@ -73,10 +76,10 @@ public class UserController {
 	//新規ユーザー登録
 	@PostMapping("/adduser")
 	public String adduserPost(
-			@Valid User user,
+			@Validated(AddUserGroup.class) User user,
 			Errors errors,
-			Model model) {
-		
+			Model model
+			) {
 		//エラーがあれば、エラーメッセージを表示
 		if (errors.hasErrors()) {
 			//エラー内容の補足
