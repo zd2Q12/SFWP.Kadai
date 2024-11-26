@@ -13,14 +13,14 @@ public interface VoteResultMapper {
 	
 	
 	//個別取得
-	VoteResult getVoteItemById(int id);
+	VoteResult getVoteResultById(int id);
 	
 	//追加
-	void addVoteItem(VoteResult voteResult);
+	void addVoteResult(VoteResult voteResult);
 	
 	//更新
-	void updateVoteItem(VoteResult voteResult);
+	void updateVoteResult(VoteResult voteResult);
 	
 	//削除
-	void deleteVoteItem(int id);
+	void deleteVoteResult(int id);
 }
