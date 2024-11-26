@@ -40,8 +40,8 @@ public class User {
 	private LocalDateTime createdAt;
 
 	//ユーザーに対しユーザー投稿 1対多　多対多
-	public List<VoteItem> votes;
+	public List<VoteItem> voteItem;
 	
 	//ユーザー、ユーザー投稿に対し、投稿結果　1対多　多対多
-	public List<VoteResult> results;
+	public List<VoteResult> voteResults;
 }
