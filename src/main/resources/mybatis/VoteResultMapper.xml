@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.app.mapper.VoteResultMapper">
+	<select id="selectAll" resultType="VoteResult">
+		select * from vote_results
+	</select>
+	
+	<select id="getVoteResultById" parameterType="int" resultType="VoteResult">
+	select vote_results.user_id, vote_results.vote_item_id,
+	vote_results.voted_at 
+	from vote_results
+	where vote_result_id = #{voteResultId}
+	</select>
+	
+	<insert id="addVoteResult" parameterType="VoteResult">
+	insert into vote_results(user_id, vote_item_id, voted_at)
+	values(#{user_id}, #{vote_item_id}, now())
+	</insert>
+	
+	<update id="updateVoteResult" parameterType="VoteResult">
+	</update>
+	
+	<delete id="deleteVoteItem" parameterType="int">
+	delete fron vote_results where vote_result_id = #{voteResultId}
+	</delete>
+</mapper>

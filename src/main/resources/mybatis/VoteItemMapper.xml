@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.app.mapper.VoteItemMapper">
+	<select id="selectAll" resultType="VoteItem">
+		select * from vote_items
+	</select>
+	
+	<select id="getVoteItemById" parameterType="int" resultType="VoteItem">
+	select vote_items.title, vote_items.description, vote_items.created_by,
+	vote_items.voting_start, vote_items.voting_end,vote_items.created_at
+	from vote_items
+	where vote_item_id = #{voteItemId}
+	</select>
+	
+	<insert id="addVoteItem" parameterType="VoteItem">
+	insert into vote_items(title, description, created_by, voting_start, voting_end, created_at)
+	values(#{title}, #{description}, #{createdBy}, #{votingStart}, #{votingEnd}, now())
+	</insert>
+	
+	<update id="updateVoteItem" parameterType="VoteItem">
+	update vote_items set title = #{title}, description = #{description},
+	voting_start = #{votingStart}, voting_end = #{votingEnd}, updated_at = now()
+	where vote_item_id = #{voteItemId}
+	</update>
+	
+	<delete id="deleteVoteItem" parameterType="int">
+	delete fron vote_items where vote_item_id = #{voteItemId}
+	</delete>
+</mapper>
