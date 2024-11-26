@@ -25,21 +25,6 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 
 	private final UserMapper userMapper;
-
-	
-	//Homeページへ
-	@GetMapping("/home")
-	public String homePage(Model model) {
-		//ほかのユーザーの投票の投稿見る、投票する、投票結果見る
-		return "home";
-	}
-	
-	@PostMapping("/home")
-	public String home() {
-		//投票の新規作成・変更更新・削除
-		//
-		return "";
-	}
 	
 	//ログインページ
 	@GetMapping("/login")
