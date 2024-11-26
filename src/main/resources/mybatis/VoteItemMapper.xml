@@ -24,6 +24,6 @@
 	</update>
 	
 	<delete id="deleteVoteItem" parameterType="int">
-	delete fron vote_items where vote_item_id = #{voteItemId}
+	delete from vote_items where vote_item_id = #{voteItemId}
 	</delete>
 </mapper>
