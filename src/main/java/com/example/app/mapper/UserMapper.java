@@ -5,6 +5,8 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.example.app.domain.User;
+import com.example.app.domain.VoteItem;
+import com.example.app.domain.VoteResult;
 
 @Mapper
 public interface UserMapper {
@@ -23,4 +25,10 @@ public interface UserMapper {
 	
 	//削除(Delete)
 	void deleteUser(int id);
+	
+	//追加：vote_itemsのvote_item_idが必要
+	Integer addVoteItem(VoteItem voteItem);
+	
+	//追加：vote_resultsのvote_result_idが必要
+	Integer addVoteResult(VoteResult voteResult);
 }
