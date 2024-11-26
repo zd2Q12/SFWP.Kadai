@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.example.app.domain.VoteItem;
+import com.example.app.domain.VoteResult;
 
 @Mapper
 public interface VoteItemMapper {
@@ -22,4 +23,7 @@ public interface VoteItemMapper {
 	
 	//削除
 	void deleteVoteItem(int id);
+	
+	//追加：vote_resultsのvote_result_idが必要
+	Integer addVoteResult(VoteResult voteResult);
 }
