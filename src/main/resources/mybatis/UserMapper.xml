@@ -7,13 +7,13 @@
 		<result property="userName" column="user_name"/>
 		
 		 <!-- voteItems (1対多の関係) -->
-		<collection property="voteItems" ofType="VoteItem"
+		<collection property="voteItems" javaType="java.util.List" ofType="VoteItem"
 			autoMapping="true">
 			<!-- <result property="createdBy" column="created_by" /> -->
 		</collection>
 		
 		   <!-- voteResults (1対多の関係) -->
-		<collection property="voteResults" ofType="VoteResult"
+		<collection property="voteResults" javaType="java.util.List" ofType="VoteResult"
 			autoMapping="true">
 		</collection>
 	</resultMap>
