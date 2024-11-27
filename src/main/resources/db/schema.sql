@@ -40,4 +40,6 @@ CREATE TABLE vote_results (
     CONSTRAINT unique_vote UNIQUE (user_id, vote_item_id)  -- ユーザーと投票アイテムの組み合わせを一意にする
 );
 ALTER TABLE vote_results ADD COLUMN vote_value TINYINT NOT NULL DEFAULT 0;
+ALTER TABLE vote_items ADD COLUMN agree_count INT DEFAULT 0, ADD COLUMN disagree_count INT DEFAULT 0;
+
 
