@@ -13,7 +13,7 @@
 		</collection>
 		
 		   <!-- voteResults (1対多の関係) -->
-		<collection property="voteResults" ofType="voteResult"
+		<collection property="voteResults" ofType="VoteResult"
 			autoMapping="true">
 		</collection>
 	</resultMap>
@@ -30,6 +30,7 @@
 		vote_items.voting_end,
 		vote_items.created_at,
 		vote_results.vote_result_id,
+		vote_results.vote_value,
 		vote_results.voted_at
 		from users
 		left join vote_items

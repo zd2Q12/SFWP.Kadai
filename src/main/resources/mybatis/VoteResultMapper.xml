@@ -7,17 +7,20 @@
 	
 	<select id="getVoteResultById" parameterType="int" resultType="VoteResult">
 	select vote_results.user_id, vote_results.vote_item_id,
-	vote_results.voted_at 
+	vote_results.vote_value, vote_results.voted_at 
 	from vote_results
 	where vote_result_id = #{voteResultId}
 	</select>
 	
 	<insert id="addVoteResult" parameterType="VoteResult">
-	insert into vote_results(user_id, vote_item_id, voted_at)
-	values(#{user_id}, #{vote_item_id}, now())
+	insert into vote_results(user_id, vote_item_id, vote_value, voted_at)
+	values(#{user_id}, #{vote_item_id}, #{vote_value}, now())
 	</insert>
 	
 	<update id="updateVoteResult" parameterType="VoteResult">
+	    update vote_results
+        set vote_value = #{vote_value}, voted_at = now()
+        where vote_result_id = #{vote_result_id}
 	</update>
 	
 	<delete id="deleteVoteItem" parameterType="int">
