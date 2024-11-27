@@ -25,13 +25,16 @@ public class VoteItemController {
 	
 	//Homeページへ遷移
 	@GetMapping("/home")
-	public String homePage(Model model,HttpServletRequest request) {
+	public String homePage(
+			Model model,
+			HttpServletRequest request
+			) {
 		HttpSession session = request.getSession();
-	  String userName = (String) session.getAttribute("user");
+	  User user = (User) session.getAttribute("user");
 	  
 	  //セッションにユーザー情報があれば、ユーザー情報をモデルに追加・表示
-	  if(userName != null) {
-	  	model.addAttribute("userName", userName);
+	  if(user != null) {
+	  	model.addAttribute("userName", user.getUserName());
 	  }
 	  
 	  
@@ -54,7 +57,16 @@ public class VoteItemController {
 			HttpServletRequest request
 			) {
 		HttpSession session = request.getSession();
-		Integer userId = (Integer) session.getAttribute("userId");
+		User user = (User) session.getAttribute("user");
+		
+
+    // ユーザーがセッションにいない場合
+    if (user == null) {
+        return "redirect:/login"; // ログインしていなければリダイレクト
+    }
+    
+ // セッションから取得したUserオブジェクトからユーザーIDを取得
+    Integer userId = user.getUserId();
 		
     // action に基づいて処理を分岐
 		if("create".equals(action)) {
@@ -101,30 +113,5 @@ public class VoteItemController {
 		voteItemmapper.updateVoteCount(voteItemId);
 		return "redirect:/home";
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 
 }
