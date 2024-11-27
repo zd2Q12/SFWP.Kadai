@@ -39,4 +39,5 @@ CREATE TABLE vote_results (
     FOREIGN KEY (vote_item_id) REFERENCES vote_items(vote_item_id),  -- 外部キー: 投票アイテムID
     CONSTRAINT unique_vote UNIQUE (user_id, vote_item_id)  -- ユーザーと投票アイテムの組み合わせを一意にする
 );
+ALTER TABLE vote_results ADD COLUMN vote_value TINYINT NOT NULL DEFAULT 0;
 
