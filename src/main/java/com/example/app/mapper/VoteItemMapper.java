@@ -26,4 +26,6 @@ public interface VoteItemMapper {
 	
 	//追加：vote_resultsのvote_result_idが必要
 	Integer addVoteResult(VoteResult voteResult);
+	
+	void updateVoteCount(Integer voteItemId);
 }
