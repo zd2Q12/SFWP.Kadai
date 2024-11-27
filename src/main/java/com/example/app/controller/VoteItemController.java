@@ -6,7 +6,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.example.app.domain.User;
 import com.example.app.domain.VoteItem;
+import com.example.app.domain.VoteResult;
 import com.example.app.mapper.VoteItemMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -75,13 +77,25 @@ public class VoteItemController {
 	public String vote(
 			@RequestParam("voteItemId")Integer voteItemId,
 			@RequestParam("voteValue")Integer voteValue,
-			HttpServletRequest request
+			HttpServletRequest request,
+			Model model
 			) {
 		HttpSession session = request.getSession();
-		Integer userId = (Integer) session.getAttribute("userId");
-		
-		//投票結果を登録
-		voteItemmapper.addVoteResult(voteItemId, userId, voteValue);
+		//セッションからユーザー情報取得
+    User user = (User) session.getAttribute("user");	
+    if(user == null) {
+    	return "redirect:/login";//ログインしてなかったらリダイレクト
+    }
+    
+    // VoteResult オブジェクトを作成して、投票結果を保存
+    VoteResult voteResult = new VoteResult();
+    voteResult.setVoteItemId(voteItemId);
+    voteResult.setUserId(user.getUserId());
+    voteResult.setVoteValue(voteValue);
+    
+    
+		//投票結果をvote_resultsに登録
+		voteItemmapper.addVoteResult(voteResult);
 		
 		//投票後に、賛成・反対票数を更新
 		voteItemmapper.updateVoteCount(voteItemId);
