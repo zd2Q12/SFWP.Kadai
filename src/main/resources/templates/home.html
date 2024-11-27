@@ -31,8 +31,8 @@
                 <td th:text="${voteItem.title}">タイトル</td>
                 <td th:text="${voteItem.agreeCount}">0</td>
                 <td th:text="${voteItem.disagreeCount}">0</td>
-                <td th:text="${#dates.format(voteItem.votingStart, 'yyyy-MM-dd')}">開始日</td>
-                <td th:text="${#dates.format(voteItem.votingEnd, 'yyyy-MM-dd')}">終了日</td>
+                <td th:text="${#temporals.format(voteItem.votingStart, 'yyyy-MM-dd')}">開始日</td>
+                <td th:text="${#temporals.format(voteItem.votingStart, 'yyyy-MM-dd')}">終了日</td>
                 <td>
                     <!-- 投票ページリンク -->
                     <a th:href="@{/voteItem/{id}(id=${voteItem.voteItemId})}">投票</a>
