@@ -34,8 +34,17 @@
                 <td th:text="${#temporals.format(voteItem.votingStart, 'yyyy-MM-dd')}">開始日</td>
                 <td th:text="${#temporals.format(voteItem.votingStart, 'yyyy-MM-dd')}">終了日</td>
                 <td>
-                    <!-- 投票ページリンク -->
-                    <a th:href="@{/voteItem/{id}(id=${voteItem.voteItemId})}">投票</a>
+                      <!-- 投票フォーム（詳細表示） -->
+                <form th:action="@{/vote}" method="post">
+                    <input type="hidden" name="voteItemId" th:value="${voteItem.voteItemId}">
+                    <input type="hidden" name="voteValue" value="1"> <!-- 賛成にセット -->
+                    <button type="submit">賛成</button>
+                </form>
+                <form th:action="@{/vote}" method="post">
+                    <input type="hidden" name="voteItemId" th:value="${voteItem.voteItemId}">
+                    <input type="hidden" name="voteValue" value="-1"> <!-- 反対にセット -->
+                    <button type="submit">反対</button>
+                </form>
                 </td>
             </tr>
         </tbody>
