@@ -10,5 +10,6 @@ public class VoteResult {
 	private Integer voteResultId;
 	private Integer userId;
 	private Integer voteItemId;
+	private Boolean voteValue;
 	private LocalDateTime votedAt;
 }
