@@ -4,34 +4,18 @@
 
 	<resultMap type="User" id="joinResult" autoMapping="true">
 		<id property="userId" column="user_id" />
-		<result property="userName" column="user_name" />
-
-		<!-- voteItems (1対多の関係) -->
+		<result property="userName" column="user_name"/>
+		
+		 <!-- voteItems (1対多の関係) -->
 		<collection property="voteItems" ofType="VoteItem"
-			javaType="java.util.List" resultMap="voteItemResultMap" />
-		<!-- <result property="createdBy" column="created_by" /> -->
-
-		<!-- voteResults (1対多の関係) -->
+			autoMapping="true">
+			<!-- <result property="createdBy" column="created_by" /> -->
+		</collection>
+		
+		   <!-- voteResults (1対多の関係) -->
 		<collection property="voteResults" ofType="VoteResult"
-			javaType="java.util.List" resultMap="voteResultResultMap" />
-	</resultMap>
-	<!-- 投票項目の結果マッピング -->
-	<resultMap id="voteItemResultMap"
-		type="VoteItem">
-		<id property="voteItemId" column="vote_item_id" />
-		<result property="title" column="title" />
-		<result property="description" column="description" />
-		<result property="createdBy" column="created_by" />
-		<result property="votingStart" column="voting_start" />
-		<result property="votingEnd" column="voting_end" />
-		<result property="createdAt" column="created_at" />
-	</resultMap>
-
-	<!-- 投票結果の結果マッピング -->
-	<resultMap id="voteResultResultMap"
-		type="VoteResult">
-		<id property="voteResultId" column="vote_result_id" />
-		<result property="votedAt" column="voted_at" />
+			autoMapping="true">
+		</collection>
 	</resultMap>
 
 	<select id="getUserById" resultMap="joinResult">
@@ -46,13 +30,15 @@
 		vote_items.voting_end,
 		vote_items.created_at,
 		vote_results.vote_result_id,
+		vote_results.vote_value,
 		vote_results.voted_at
-		  from users
+		from users
 		left join vote_items
-		     on users.user_id = vote_items.created_by
+		on users.user_id = vote_items.created_by
 		left join vote_results
-		     on users.user_id = vote_results.user_id
-		and vote_items.vote_item_id = vote_results.vote_item_id
+		on users.user_id = vote_results.user_id
+		and
+		vote_items.vote_item_id = vote_results.vote_item_id
 		where users.user_id = #{userId}
 	</select>
 
