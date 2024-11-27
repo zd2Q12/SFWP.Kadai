@@ -21,7 +21,7 @@ public class VoteItemController {
 
 	private final VoteItemMapper voteItemmapper;
 	
-	//Homeページへ
+	//Homeページへ遷移
 	@GetMapping("/home")
 	public String homePage(Model model,HttpServletRequest request) {
 		HttpSession session = request.getSession();
@@ -48,10 +48,16 @@ public class VoteItemController {
 	public String createVoteItem(
 			@RequestParam("action")String action,
 			VoteItem voteItem,
-			@RequestParam(value= "id", required = false)Integer id
+			@RequestParam(value= "id", required = false)Integer id,
+			HttpServletRequest request
 			) {
+		HttpSession session = request.getSession();
+		Integer userId = (Integer) session.getAttribute("userId");
+		
+    // action に基づいて処理を分岐
 		if("create".equals(action)) {
 			//新規作成
+			voteItem.setCreatedBy(userId);
 			voteItemmapper.addVoteItem(voteItem);			
 		}else if("update".equals(action)) {
 		     // 更新
@@ -63,5 +69,48 @@ public class VoteItemController {
 		}
 		return "redirect:/home";
 	}
+	
+	//投票結果の追加処理
+	@PostMapping("/vote")
+	public String vote(
+			@RequestParam("voteItemId")Integer voteItemId,
+			@RequestParam("voteValue")Integer voteValue,
+			HttpServletRequest request
+			) {
+		HttpSession session = request.getSession();
+		Integer userId = (Integer) session.getAttribute("userId");
+		
+		//投票結果を登録
+		voteItemmapper.addVoteResult(voteItemId, userId, voteValue);
+		
+		//投票後に、賛成・反対票数を更新
+		voteItemmapper.updateVoteCount(voteItemId);
+		return "redirect:/home";
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 }
