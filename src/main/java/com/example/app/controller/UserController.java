@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 
 	private final UserMapper userMapper;
-	
+
 	//ログインページ
 	@GetMapping("/login")
 	public String loginPage(
@@ -43,8 +43,7 @@ public class UserController {
 			Errors errors,
 			Model model,
 			HttpServletRequest request,
-			HttpServletResponse response
-			) {
+			HttpServletResponse response) {
 		//ユーザー名とパスワードでユーザーを取得
 		User foundUser = userMapper.getUserByUserNameAndPassword(user.getUserName(), user.getPassword());
 		// 入力エラーがあれば、ログインページに戻る
@@ -58,15 +57,12 @@ public class UserController {
 
 		} else {
 			//認証OK-＞セッションに保存
-				HttpSession session = request.getSession();
-				session.setAttribute("user", foundUser);//セッションにユーザー情報を格納
-				//model.addAttribute("user", foundUser);
-				return "redirect:/home";//ログインしたらHOMEページへリダイレクト
-			}//homeは
-		}
-	
-
-
+			HttpSession session = request.getSession();
+			session.setAttribute("user", foundUser);//セッションにユーザー情報を格納
+			//model.addAttribute("user", foundUser);
+			return "redirect:/home";//ログインしたらHOMEページへリダイレクト
+		} //homeは
+	}
 
 	//新規ユーザー登録ページを表示
 	@GetMapping("/addUser")
@@ -96,7 +92,57 @@ public class UserController {
 			model.addAttribute("message", "ユーザー登録完了");
 
 			return "redirect:/login";//登録完了後はログインページに遷移
-		}//VoteControllerのhomeにリダイレクト
+		} //VoteControllerのhomeにリダイレクト
+	}
+
+	//ユーザーの更新ページ表示
+	@GetMapping("/updateUser")
+	public String updateUserPage(Model model, HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		User loggedInUser = (User) session.getAttribute("user");
+
+		if (loggedInUser == null) {
+			return "redirect:/login";
+		}
+
+		model.addAttribute("user", loggedInUser);
+		return "updateUser";
+	}
+
+	//ユーザーの更新
+	@PostMapping("/updateUser")
+	public String updateUser(
+			@Validated User user,
+			Errors errors,
+			Model model,
+			HttpServletRequest request) {
+		//セッションからユーザー情報取得
+		HttpSession session = request.getSession();
+		User loggedInUser = (User) session.getAttribute("user");
+
+		if (loggedInUser == null) {
+			return "redirect:/login";
+		}
+		// 入力エラーがあれば、エラーメッセージを表示
+		if (errors.hasErrors()) {
+			List<ObjectError> objList = errors.getAllErrors();
+			for (ObjectError obj : objList) {
+				System.out.println(obj.toString());
+			}
+			model.addAttribute("user", loggedInUser);// フォームに現在のデータを保持
+			return "updateUser";// エラーがあれば、更新ページを再表示
+		} else {
+			//ユーザー情報を更新
+			user.setUserId(loggedInUser.getUserId());// セッションのユーザーIDを更新対象に設定
+			userMapper.updateUser(user);//DBへ保存
+
+			//更新後にセッション情報も更新
+			session.setAttribute("user", user);
+
+			model.addAttribute("message", "ユーザー情報を更新しました");
+			return "redirect:/home";// 更新後はホーム画面へリダイレクト
+		}
+
 	}
 
 	//ユーザーの削除
