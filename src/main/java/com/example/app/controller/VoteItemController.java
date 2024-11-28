@@ -2,6 +2,7 @@ package com.example.app.controller;
 
 import java.util.List;
 
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,6 +32,12 @@ public class VoteItemController {
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("user");
 
+	// デバッグ用に確認
+		if (user == null) {
+		    System.out.println("User is null, session expired or not set correctly.");
+		} else {
+		    System.out.println("User session is valid: " + user.getUserName());
+		}
 		//セッションにユーザー情報があれば、ユーザー情報をモデルに追加・表示
 		if (user != null) {
 			model.addAttribute("userName", user.getUserName());
@@ -38,19 +45,18 @@ public class VoteItemController {
 
 		//全ての投票を取得（他のユーザーの投稿を表示）
 		List<VoteItem> voteItems = voteItemmapper.selectAll();
-
+/*
 		// ユーザーが投票済みの情報を取得
 		if (user != null) {
 			for (VoteItem voteItem : voteItems) {
 				//各投票アイテムに対し、ユーザーが投票した結果を取得
-				VoteResult existingVote = voteItemmapper.findVoteResultByUserIdAndVoteItemId(user.getUserId(),
-						voteItem.getVoteItemId());
+				VoteResult existingVote = voteItemmapper.findVoteResultByUserIdAndVoteItemId(user.getUserId(),voteItem.getVoteItemId());
 				if (existingVote != null) {
 					//投票済みの場合、その結果を渡す
 					model.addAttribute("votedItem_" + voteItem.getVoteItemId(), existingVote.getVoteValue());
 				}
 			}
-		}
+		}**/
 
 		// 投票アイテムのリストをビューに渡す
 		model.addAttribute("voteItems", voteItems);
@@ -106,8 +112,20 @@ public class VoteItemController {
 		//セッションからユーザー情報取得
 		User user = (User) session.getAttribute("user");
 		if (user == null) {
+      model.addAttribute("errorMessage", "ログインしていないため投票できません。");
 			return "redirect:/login";//ログインしてなかったらリダイレクト
 		}
+		
+    // すでに投票しているかチェック
+    VoteResult existingVote = voteItemmapper.findVoteResultByUserIdAndVoteItemId(user.getUserId(), voteItemId);
+    if (existingVote != null) {
+        // 投票済みの場合、エラーメッセージを渡す
+        model.addAttribute("errorMessage", "すでに投票済みです。");
+        // 投票アイテムのリストを再取得
+        List<VoteItem> voteItems = voteItemmapper.selectAll();
+        model.addAttribute("voteItems", voteItems);
+        return "home"; // ホーム画面に戻る
+    }
 
 		// VoteResult オブジェクトを作成して、投票結果を保存(投票結果を新規に追加)
 		VoteResult voteResult = new VoteResult();
@@ -115,8 +133,18 @@ public class VoteItemController {
 		voteResult.setUserId(user.getUserId());
 		voteResult.setVoteValue(voteValue);
 
-		//投票結果をvote_resultsに登録
-		voteItemmapper.addVoteResult(voteResult);
+
+    // 投票結果をデータベースに挿入
+		//重複した投票防止
+    try {
+        voteItemmapper.addVoteResult(voteResult);  // ここで重複チェックが行われる
+    } catch (DuplicateKeyException e) {
+        // 重複エラーが発生した場合、エラーメッセージを表示
+        model.addAttribute("errorMessage", "すでに投票済みです。");
+        List<VoteItem> voteItems = voteItemmapper.selectAll();
+        model.addAttribute("voteItems", voteItems);
+        return "home"; // ホーム画面に戻る
+    }
 
 		//投票後に、賛成・反対票数を更新
 		voteItemmapper.updateVoteCount(voteItemId);
