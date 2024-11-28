@@ -12,6 +12,11 @@
     <div th:if="${userName != null}">
         <p>ようこそ、<span th:text="${userName}">ユーザー名</span>さん！</p>
     </div>
+    
+        <!-- 投票済みメッセージの表示 -->
+    <div th:if="${errorMessage != null}" style="color: red; font-weight: bold;">
+        <p th:text="${errorMessage}"></p>
+    </div>
 
     <!-- 投票アイテム一覧 -->
     <h2>投票アイテム一覧</h2>
