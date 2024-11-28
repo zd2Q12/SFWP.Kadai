@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Insert title here</title>
+</head>
+
+<body>
+	<h2>ユーザー情報更新</h2>
+
+	<!-- エラーメッセージ -->
+	<div th:if="${message}" th:text="${message}" style="color:green;"></div>
+
+	<form action="" method="post" th:object="${user}">
+		<p><label for="userName">ユーザー名：</label>
+			<input type="text" th:field="*{userName}">
+		</p>
+		<p>
+			<label for="password">新しいパスワード：</label>
+			<input type="password" th:field="*{password}">
+		</p>
+
+		<p>
+			<label for="email">メールアドレス：</label>
+			<input type="email" th:field="*{email}">
+		</p>
+
+		<p>
+			<label for="birthday">誕生日：</label>
+			<input type="date" th:field="*{birthday}">
+		</p>
+		<p>
+			<label for="memo">メモ：</label>
+			<textarea th:field="*{memo}" cols="30" rows="10"></textarea>
+		</p>
+		<button type="submit">更新</button>
+	</form>
+<a th:href="@{/home}"></a>
+</body>
+
+</html>
