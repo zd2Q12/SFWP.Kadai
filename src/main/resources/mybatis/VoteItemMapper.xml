@@ -7,48 +7,72 @@
 
 	<select id="getVoteItemById" parameterType="int"
 		resultType="VoteItem">
-		select vote_items.title, vote_items.description, vote_items.created_by,
+		select vote_items.title, vote_items.description,
+		vote_items.created_by,
 		vote_items.voting_start,
 		vote_items.voting_end,vote_items.created_at,vote_items.updated_at,
 		vote_items.agree_count, vote_items.disagree_count
 		from vote_items
-		where vote_item_id = #{voteItemId}
+		where
+		vote_item_id = #{voteItemId}
 	</select>
 
 	<!-- 新しい投票アイテムを追加 -->
 	<insert id="addVoteItem" parameterType="VoteItem">
-		insert into vote_items(title, description, created_by, voting_start,
-		voting_end, created_at, agree_count, disagree_count)
-		values(#{title}, #{description}, #{createdBy}, #{votingStart}, #{votingEnd},
+		insert into
+		vote_items(title, description, created_by, voting_start,
+		voting_end,
+		created_at, agree_count, disagree_count)
+		values(#{title},
+		#{description}, #{createdBy}, #{votingStart}, #{votingEnd},
 		now(),#{agreeCount}, #{disagreeCount})
 	</insert>
 
 	<!-- 投票アイテムを更新 -->
 	<update id="updateVoteItem" parameterType="VoteItem">
-		update vote_items set title = #{title}, description = #{description},
-		voting_start = #{votingStart}, voting_end = #{votingEnd}, updated_at =
+		update vote_items set
+		title = #{title}, description = #{description},
+		voting_start =
+		#{votingStart}, voting_end = #{votingEnd}, updated_at =
 		now(),
 		agree_count = #{agreeCount}, disagree_count = #{disagreeCount}
-		where vote_item_id = #{voteItemId}
+		where
+		vote_item_id = #{voteItemId}
 	</update>
 
 	<delete id="deleteVoteItem" parameterType="int">
-		delete from vote_items where vote_item_id = #{voteItemId}
+		delete from vote_items
+		where vote_item_id = #{voteItemId}
 	</delete>
 
 	<!-- 投票結果の追加 -->
 	<insert id="addVoteResult" parameterType="VoteResult">
-		INSERT INTO vote_results (vote_item_id, user_id, vote_value)
-		VALUES (#{voteItemId}, #{userId}, #{voteValue})
+		INSERT INTO
+		vote_results (vote_item_id, user_id, vote_value)
+		VALUES (#{voteItemId},
+		#{userId}, #{voteValue})
 	</insert>
 
 	<!-- 投票後に賛成・反対票数を更新 -->
 	<update id="updateVoteCount">
 		UPDATE vote_items
-		SET agree_count = (SELECT COUNT(*) FROM vote_results WHERE vote_item_id =
-		#{voteItemId} AND vote_value = 1),
-		disagree_count = (SELECT COUNT(*) FROM vote_results WHERE vote_item_id =
+		SET agree_count = (SELECT COUNT(*)
+		FROM vote_results WHERE vote_item_id =
+		#{voteItemId} AND vote_value =
+		1),
+		disagree_count = (SELECT COUNT(*) FROM vote_results WHERE
+		vote_item_id =
 		#{voteItemId} AND vote_value = -1)
-		WHERE vote_item_id = #{voteItemId}
+		WHERE vote_item_id =
+		#{voteItemId}
 	</update>
+
+	<!-- ユーザーが特定の投票アイテムに投票したかを確認するクエリ -->
+	<select id="findVoteResultByUserIdAndVoteItemId"
+		resultType="VoteResult">
+		SELECT * FROM vote_results
+		WHERE vote_item_id = #{voteItemId} AND user_id = #{userId}
+		LIMIT 1
+	</select>
+
 </mapper>
