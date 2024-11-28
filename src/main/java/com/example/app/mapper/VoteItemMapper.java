@@ -3,6 +3,7 @@ package com.example.app.mapper;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import com.example.app.domain.VoteItem;
 import com.example.app.domain.VoteResult;
@@ -28,4 +29,7 @@ public interface VoteItemMapper {
 	Integer addVoteResult(VoteResult voteResult);
 	
 	void updateVoteCount(Integer voteItemId);
+	
+  // 追加：ユーザーが特定の投票アイテムに投票した結果を取得する
+  VoteResult findVoteResultByUserIdAndVoteItemId(@Param("voteItemId") Integer voteItemId, @Param("userId") Integer userId);
 }
