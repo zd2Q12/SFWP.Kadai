@@ -1,121 +1,190 @@
 <!DOCTYPE html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
 <head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
+	<meta charset="UTF-8">
+	<title>Insert title here</title>
+	<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </head>
+
 <body>
-<h2>Home</h2>
-<p><a class="mt-4 ml-4 btn btn-secondary" th:href="@{/login}">ログアウト</a></p>
+	<h2>Home</h2>
+	<p><a class="mt-4 ml-4 btn btn-secondary" th:href="@{/login}">ログアウト</a></p>
 
 
-    <!-- ユーザー情報の表示 -->
-    <div th:if="${userName != null}">
-        <p><a th:href="@{/updateUser}">ようこそ、<span th:text="${userName}">ユーザー名</span>さん！</a></p>
-    </div>
-    
-        <!-- 投票済みメッセージの表示 -->
-    <div th:if="${errorMessage != null}" style="color: red; font-weight: bold;">
-        <p th:text="${errorMessage}"></p>
-    </div>
+	<!-- ユーザー情報の表示 -->
+	<div th:if="${userName != null}">
+		<p><a th:href="@{/updateUser}">ようこそ、<span th:text="${userName}">ユーザー名</span>さん！</a></p>
+	</div>
 
-    <!-- 投票アイテム一覧 -->
-    <h2>投票アイテム一覧</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>タイトル</th>
-                <th>賛成票</th>
-                <th>反対票</th>
-                <th>投票開始</th>
-                <th>投票終了</th>
-                <th>アクション</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="voteItem : ${voteItems}">
-                <td th:text="${voteItem.title}">タイトル</td>
-                <td th:text="${voteItem.agreeCount}">0</td>
-                <td th:text="${voteItem.disagreeCount}">0</td>
-                <td th:text="${#temporals.format(voteItem.votingStart, 'yyyy-MM-dd')}">開始日</td>
-                <td th:text="${#temporals.format(voteItem.votingStart, 'yyyy-MM-dd')}">終了日</td>
-                <td>
-                      <!-- 投票フォーム（詳細表示） -->
-                <form th:action="@{/vote}" method="post">
-                    <input type="hidden" name="voteItemId" th:value="${voteItem.voteItemId}">
-                    <input type="hidden" name="voteValue" value="1"> <!-- 賛成にセット -->
-                    <button type="submit">賛成</button>
-                </form>
-                <form th:action="@{/vote}" method="post">
-                    <input type="hidden" name="voteItemId" th:value="${voteItem.voteItemId}">
-                    <input type="hidden" name="voteValue" value="-1"> <!-- 反対にセット -->
-                    <button type="submit">反対</button>
-                </form>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+	<!-- 投票済みメッセージの表示 -->
+	<div th:if="${errorMessage != null}" style="color: red; font-weight: bold;">
+		<p th:text="${errorMessage}"></p>
+	</div>
 
-    <!-- 新規投票作成フォーム -->
-    <h2>新規投票作成</h2>
-    <form th:action="@{/home}" method="post">
-        <input type="hidden" name="action" value="create">
-        <div>
-            <label for="title">タイトル:</label>
-            <input type="text" id="title" name="title" required>
-        </div>
-        <div>
-            <label for="description">説明:</label>
-            <textarea id="description" name="description" required></textarea>
-        </div>
-        <div>
-            <label for="votingStart">投票開始:</label>
-            <input type="datetime-local" id="votingStart" name="votingStart" required>
-        </div>
-        <div>
-            <label for="votingEnd">投票終了:</label>
-            <input type="datetime-local" id="votingEnd" name="votingEnd" required>
-        </div>
-        <button type="submit">投票アイテムを作成</button>
-    </form>
+	<!-- 投票アイテム一覧 -->
+	<h2>投票アイテム一覧</h2>
+	<table>
+		<thead>
+			<tr>
+				<th>タイトル</th>
+				<th>賛成票</th>
+				<th>反対票</th>
+				<th>投票開始</th>
+				<th>投票終了</th>
+				<th>アクション</th>
+				<th>更新</th>
+				<th>削除</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="voteItem : ${voteItems}">
+				<td th:text="${voteItem.title}">タイトル</td>
+				<td th:text="${voteItem.agreeCount}">0</td>
+				<td th:text="${voteItem.disagreeCount}">0</td>
+				<td th:text="${#temporals.format(voteItem.votingStart, 'yyyy-MM-dd')}">開始日</td>
+				<td th:text="${#temporals.format(voteItem.votingStart, 'yyyy-MM-dd')}">終了日</td>
+				<td>
+					<!-- 賛成・反対ボタン（他のユーザーの投稿にのみ表示） -->
+					<form th:action="@{/vote}" method="post">
+						<input type="hidden" name="voteItemId" th:value="${voteItem.voteItemId}">
+						<input type="hidden" name="voteValue" value="1"> <!-- 賛成にセット -->
+						<button type="submit">賛成</button>
+					</form>
 
-    <!-- 投票アイテムの更新・削除フォーム -->
-    <h2>既存の投票アイテム管理</h2>
-    <form th:action="@{/home}" method="post">
-        <input type="hidden" name="action" value="update">
-        <div>
-            <label for="updateId">投票アイテムID:</label>
-            <input type="number" id="updateId" name="id" required>
-        </div>
-        <div>
-            <label for="updateTitle">タイトル:</label>
-            <input type="text" id="updateTitle" name="title" required>
-        </div>
-        <div>
-            <label for="updateDescription">説明:</label>
-            <textarea id="updateDescription" name="description" required></textarea>
-        </div>
-        <div>
-            <label for="updateVotingStart">投票開始:</label>
-            <input type="date" id="updateVotingStart" name="votingStart" required>
-        </div>
-        <div>
-            <label for="updateVotingEnd">投票終了:</label>
-            <input type="date" id="updateVotingEnd" name="votingEnd" required>
-        </div>
-        <button type="submit">投票アイテムを更新</button>
-    </form>
+					<form th:action="@{/vote}" method="post">
+						<input type="hidden" name="voteItemId" th:value="${voteItem.voteItemId}">
+						<input type="hidden" name="voteValue" value="-1"> <!-- 反対にセット -->
+						<button type="submit">反対</button>
+					</form>
+				</td>
+				<td>
+					<!-- 更新ボタン：モーダル表示のトリガー（自分の投稿にのみ表示） -->
+					<div th:if="${userId == voteItem.createdBy}">
+						<button class="btn btn-primary" data-toggle="modal" data-target="#updateModal"
+							onclick="setUpdateFormData(${voteItem.voteItemId}, '${voteItem.title}', '${voteItem.description}', '${#temporals.format(voteItem.votingStart, 'yyyy-MM-dd')}', '${#temporals.format(voteItem.votingEnd, 'yyyy-MM-dd')}')">更新</button>
+					</div>
+				</td>
+				<td>
+					<!-- 削除ボタン：確認ポップアップ （自分の投稿にのみ表示）-->
+					<div th:if="${userId == voteItem.createdBy}">
+						<button class="btn btn-danger" onclick="confirmDelete(${voteItem.voteItemId})">削除</button>
+					</div>
+				</td>
 
-    <!-- 投票アイテム削除 -->
-    <h2>投票アイテム削除</h2>
-    <form th:action="@{/home}" method="post">
-        <input type="hidden" name="action" value="delete">
-        <div>
-            <label for="deleteId">削除したい投票アイテムID:</label>
-            <input type="number" id="deleteId" name="id" required>
-        </div>
-        <button type="submit">削除</button>
-    </form>
+			</tr>
 
+
+		</tbody>
+	</table>
+
+	<!-- 新規投票作成フォーム -->
+	<h2>新規投票作成</h2>
+	<form th:action="@{/home}" method="post">
+		<input type="hidden" name="action" value="create">
+		<div>
+			<label for="title">タイトル:</label>
+			<input type="text" id="title" name="title" required>
+		</div>
+		<div>
+			<label for="description">説明:</label>
+			<textarea id="description" name="description" required></textarea>
+		</div>
+		<div>
+			<label for="votingStart">投票開始:</label>
+			<input type="datetime-local" id="votingStart" name="votingStart" required>
+		</div>
+		<div>
+			<label for="votingEnd">投票終了:</label>
+			<input type="datetime-local" id="votingEnd" name="votingEnd" required>
+		</div>
+		<button type="submit">投票アイテムを作成</button>
+	</form>
+	<!-- 更新フォームモーダル -->
+	<div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel"
+		aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="updateModalLabel">投票アイテム更新</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<form th:action="@{/home}" method="post">
+						<input type="hidden" name="action" value="update">
+						<div>
+							<label for="updateId">投票アイテムID:</label>
+							<input type="number" id="updateId" name="id" required readonly>
+						</div>
+						<div>
+							<label for="updateTitle">タイトル:</label>
+							<input type="text" id="updateTitle" name="title" required>
+						</div>
+						<div>
+							<label for="updateDescription">説明:</label>
+							<textarea id="updateDescription" name="description" required></textarea>
+						</div>
+						<div>
+							<label for="updateVotingStart">投票開始:</label>
+							<input type="date" id="updateVotingStart" name="votingStart" required>
+						</div>
+						<div>
+							<label for="updateVotingEnd">投票終了:</label>
+							<input type="date" id="updateVotingEnd" name="votingEnd" required>
+						</div>
+						<button type="submit" class="btn btn-primary">投票アイテムを更新</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- 削除確認ポップアップ -->
+	<div id="deleteConfirmation" class="modal" tabindex="-1" role="dialog">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">削除確認</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<p>本当に削除してもよろしいですか？</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">キャンセル</button>
+					<form id="deleteForm" method="post" style="display: inline;">
+						<input type="hidden" name="action" value="delete">
+						<input type="hidden" name="id" id="deleteItemId">
+						<button type="submit" class="btn btn-danger">削除</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		function setUpdateFormData(id, title, description, votingStart, votingEnd) {
+			document.getElementById('updateId').value = id;
+			document.getElementById('updateTitle').value = title;
+			document.getElementById('updateDescription').value = description;
+			document.getElementById('updateVotingStart').value = votingStart;
+			document.getElementById('updateVotingEnd').value = votingEnd;
+		}
+
+		function confirmDelete(voteItemId) {
+			// 削除するIDをhiddenフィールドに設定
+			document.getElementById('deleteItemId').value = voteItemId;
+			// モーダルを表示
+			$('#deleteConfirmation').modal('show');
+		}
+	</script>
 </body>
+
 </html>
