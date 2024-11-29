@@ -39,9 +39,31 @@
 			<label for="memo">メモ：</label>
 			<textarea th:field="*{memo}" cols="30" rows="10"></textarea>
 		</p>
-		<button type="submit">更新</button>
+		<!--更新ボタン-->
+		<button type="submit" class="btn btn-primary">更新</button>
+		<!--削除ボタン-->
+		<button type="button" class="btn btn-danger" id="deleteButton">削除</button>
 	</form>
 	<a th:href="@{/home}">戻る</a>
+
+	<!--削除確認のポップ-->
+	<script>
+		document.getElementById('deleteButton').addEventListener('click', function () {
+			if (confirm("本当に削除してよろしいですか？"))
+				//削除ボタンが押されたら、フォームを送信して削除処理を実行
+				var form = document.querySelector('form');
+			var input = document.createElement('input');
+			input.type = 'hidden';
+			input.name = 'action';
+			input.value = 'delete';
+			form.appendChild(input);
+			form.submit();
+		});
+	</script>
+	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 </body>
 
 </html>
