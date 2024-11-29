@@ -1,5 +1,6 @@
 package com.example.app.controller;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.dao.DuplicateKeyException;
@@ -41,6 +42,7 @@ public class VoteItemController {
 		//セッションにユーザー情報があれば、ユーザー情報をモデルに追加・表示
 		if (user != null) {
 			model.addAttribute("userName", user.getUserName());
+			model.addAttribute("userId", user.getUserId());
 		}
 
 		//全ての投票を取得（他のユーザーの投稿を表示）
