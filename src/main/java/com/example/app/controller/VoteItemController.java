@@ -28,13 +28,18 @@ public class VoteItemController {
 
   // すべてのリクエストで共通のユーザー情報を取得
   @ModelAttribute("user")
-  public User getUser(HttpServletRequest request) {
+  public User getUser(HttpServletRequest request,Model model) {
       HttpSession session = request.getSession();
       User loggedInUser = (User) session.getAttribute("user");
+      
       // ログインしていない場合、カスタム例外をスローしてリダイレクトさせる
       if (loggedInUser == null) {
-          throw new RedirectToLoginException();
+      	throw new RedirectToLoginException();
       }
+    	//ユーザー情報をモデルに追加・表示
+  			model.addAttribute("userName", loggedInUser.getUserName());
+  			model.addAttribute("userId", loggedInUser.getUserId());
+  	
 
       return loggedInUser; // ログインしている場合はそのユーザー情報を返す
   }

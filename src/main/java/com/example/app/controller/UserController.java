@@ -117,10 +117,11 @@ public class UserController {
 	//ユーザーの更新
 	@PostMapping("/updateUser")
 	public String updateUser(
-			@Validated User user,
+			@Validated(AddUserGroup.class)  User user,
 			Errors errors,
 			Model model,
 			HttpServletRequest request) {
+		
 		//セッションからユーザー情報取得
 		User loggedInUser = (User) request.getSession().getAttribute("user");
 
