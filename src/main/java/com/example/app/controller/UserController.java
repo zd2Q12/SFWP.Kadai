@@ -10,6 +10,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.app.domain.User;
 import com.example.app.mapper.UserMapper;
@@ -114,13 +115,14 @@ public class UserController {
 		return "updateUser";
 	}
 
-	//ユーザーの更新
+	//ユーザーの更新・削除
 	@PostMapping("/updateUser")
 	public String updateUser(
 			@Validated(AddUserGroup.class)  User user,
 			Errors errors,
 			Model model,
-			HttpServletRequest request) {
+			HttpServletRequest request,
+			@RequestParam(required = false)String action) {
 		
 		//セッションからユーザー情報取得
 		User loggedInUser = (User) request.getSession().getAttribute("user");
@@ -128,6 +130,17 @@ public class UserController {
 		if (loggedInUser == null) {
 			return "redirect:/login";
 		}
+		
+		//削除ボタンが押された場合
+		if("delete".equals(action)) {
+			userMapper.deleteUser(loggedInUser.getUserId());
+			
+			//セッションを無効か
+			request.getSession().invalidate();
+			return "redirect:/login";//削除-＞ログインページへ
+		}
+		
+		//更新
 		// 入力エラーがあれば、エラーメッセージを表示
 		if (errors.hasErrors()) {
 			List<ObjectError> objList = errors.getAllErrors();
@@ -149,5 +162,4 @@ public class UserController {
 
 	}
 
-	//ユーザーの削除
 }
