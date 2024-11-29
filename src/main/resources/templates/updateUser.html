@@ -10,22 +10,27 @@
 	<h2>ユーザー情報更新</h2>
 
 	<!-- エラーメッセージ -->
-	<div th:if="${message}" th:text="${message}" style="color:green;"></div>
+	<div th:if="${message != null}">
+		<p th:text="${message}"></p>
+	</div>
 
 	<form action="" method="post" th:object="${user}">
+		<p class="error" th:errors="*{userName}"></p>
 		<p><label for="userName">ユーザー名：</label>
 			<input type="text" th:field="*{userName}">
 		</p>
+		<p class="error" th:errors="*{password}"></p>
+
 		<p>
 			<label for="password">新しいパスワード：</label>
 			<input type="password" th:field="*{password}">
 		</p>
-
+		<p class="error" th:errors="*{email}"></p>
 		<p>
 			<label for="email">メールアドレス：</label>
 			<input type="email" th:field="*{email}">
 		</p>
-
+		<p class="error" th:errors="*{birthday}"></p>
 		<p>
 			<label for="birthday">誕生日：</label>
 			<input type="date" th:field="*{birthday}">
@@ -36,7 +41,7 @@
 		</p>
 		<button type="submit">更新</button>
 	</form>
-<a th:href="@{/home}"></a>
+	<a th:href="@{/home}">戻る</a>
 </body>
 
 </html>
