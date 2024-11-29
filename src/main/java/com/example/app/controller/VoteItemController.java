@@ -1,12 +1,13 @@
 package com.example.app.controller;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -25,21 +26,36 @@ public class VoteItemController {
 
 	private final VoteItemMapper voteItemmapper;
 
+  // すべてのリクエストで共通のユーザー情報を取得
+  @ModelAttribute("user")
+  public User getUser(HttpServletRequest request) {
+      HttpSession session = request.getSession();
+      User loggedInUser = (User) session.getAttribute("user");
+      // ログインしていない場合、カスタム例外をスローしてリダイレクトさせる
+      if (loggedInUser == null) {
+          throw new RedirectToLoginException();
+      }
+
+      return loggedInUser; // ログインしている場合はそのユーザー情報を返す
+  }
+
+  // ログインしていない場合にリダイレクトさせるための例外クラス
+  public static class RedirectToLoginException extends RuntimeException {}
+
+  // 例外ハンドラーでリダイレクト処理
+  @ExceptionHandler(RedirectToLoginException.class)
+  public String handleRedirectToLogin() {
+      return "redirect:/login"; // ログイン画面へ遷移
+    }
+  
+	
 	//Homeページへ遷移
 	@GetMapping("/home")
-	public String homePage(
-			Model model,
-			HttpServletRequest request) {
-		HttpSession session = request.getSession();
-		User user = (User) session.getAttribute("user");
+	public String homePage(Model model) {
+    // セッションから取得したユーザー情報を自動的にモデルに追加
+		User user = (User) model.getAttribute("user");
 
-	// デバッグ用に確認
-		if (user == null) {
-		    System.out.println("User is null, session expired or not set correctly.");
-		} else {
-		    System.out.println("User session is valid: " + user.getUserName());
-		}
-		//セッションにユーザー情報があれば、ユーザー情報をモデルに追加・表示
+		//ユーザー情報をモデルに追加・表示
 		if (user != null) {
 			model.addAttribute("userName", user.getUserName());
 			model.addAttribute("userId", user.getUserId());
@@ -47,22 +63,8 @@ public class VoteItemController {
 
 		//全ての投票を取得（他のユーザーの投稿を表示）
 		List<VoteItem> voteItems = voteItemmapper.selectAll();
-/*
-		// ユーザーが投票済みの情報を取得
-		if (user != null) {
-			for (VoteItem voteItem : voteItems) {
-				//各投票アイテムに対し、ユーザーが投票した結果を取得
-				VoteResult existingVote = voteItemmapper.findVoteResultByUserIdAndVoteItemId(user.getUserId(),voteItem.getVoteItemId());
-				if (existingVote != null) {
-					//投票済みの場合、その結果を渡す
-					model.addAttribute("votedItem_" + voteItem.getVoteItemId(), existingVote.getVoteValue());
-				}
-			}
-		}**/
-
 		// 投票アイテムのリストをビューに渡す
 		model.addAttribute("voteItems", voteItems);
-
 		//新規投票作成用フォーム
 		model.addAttribute("voteItem", new VoteItem());
 
@@ -75,9 +77,7 @@ public class VoteItemController {
 			@RequestParam("action") String action,
 			VoteItem voteItem,
 			@RequestParam(value = "id", required = false) Integer id,
-			HttpServletRequest request) {
-		HttpSession session = request.getSession();
-		User user = (User) session.getAttribute("user");
+			@ModelAttribute("user")User user) {
 
 		// ユーザーがセッションにいない場合
 		if (user == null) {
@@ -108,11 +108,9 @@ public class VoteItemController {
 	public String vote(
 			@RequestParam("voteItemId") Integer voteItemId,
 			@RequestParam("voteValue") Integer voteValue,
-			HttpServletRequest request,
+			@ModelAttribute("user")User user,
 			Model model) {
-		HttpSession session = request.getSession();
-		//セッションからユーザー情報取得
-		User user = (User) session.getAttribute("user");
+
 		if (user == null) {
       model.addAttribute("errorMessage", "ログインしていないため投票できません。");
 			return "redirect:/login";//ログインしてなかったらリダイレクト

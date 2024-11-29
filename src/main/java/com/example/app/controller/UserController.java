@@ -8,6 +8,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import com.example.app.domain.User;
@@ -16,7 +17,6 @@ import com.example.app.validation.AddUserGroup;
 import com.example.app.validation.LoginGroup;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
@@ -26,10 +26,17 @@ public class UserController {
 
 	private final UserMapper userMapper;
 
+	//すべてのリクエストでユーザー情報をセッションから取得
+	@ModelAttribute("user")
+	public User getUser(HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		User loggedInUser = (User) session.getAttribute("user");
+		return loggedInUser != null ? loggedInUser : new User();//ログインしていない場合
+	}
+
 	//ログインページ
 	@GetMapping("/login")
-	public String loginPage(
-			Model model) {
+	public String loginPage(Model model) {
 		// 新しいUserオブジェクトをモデルに追加
 		model.addAttribute("user", new User());
 		return "login";//ログインページへ
@@ -42,8 +49,7 @@ public class UserController {
 			@Validated(LoginGroup.class) User user,
 			Errors errors,
 			Model model,
-			HttpServletRequest request,
-			HttpServletResponse response) {
+			HttpServletRequest request) {
 		//ユーザー名とパスワードでユーザーを取得
 		User foundUser = userMapper.getUserByUserNameAndPassword(user.getUserName(), user.getPassword());
 		// 入力エラーがあれば、ログインページに戻る
@@ -98,8 +104,7 @@ public class UserController {
 	//ユーザーの更新ページ表示
 	@GetMapping("/updateUser")
 	public String updateUserPage(Model model, HttpServletRequest request) {
-		HttpSession session = request.getSession();
-		User loggedInUser = (User) session.getAttribute("user");
+		User loggedInUser = (User) request.getSession().getAttribute("user");
 
 		if (loggedInUser == null) {
 			return "redirect:/login";
@@ -117,8 +122,7 @@ public class UserController {
 			Model model,
 			HttpServletRequest request) {
 		//セッションからユーザー情報取得
-		HttpSession session = request.getSession();
-		User loggedInUser = (User) session.getAttribute("user");
+		User loggedInUser = (User) request.getSession().getAttribute("user");
 
 		if (loggedInUser == null) {
 			return "redirect:/login";
@@ -137,8 +141,7 @@ public class UserController {
 			userMapper.updateUser(user);//DBへ保存
 
 			//更新後にセッション情報も更新
-			session.setAttribute("user", user);
-
+			request.getSession().setAttribute("user", user);
 			model.addAttribute("message", "ユーザー情報を更新しました");
 			return "redirect:/home";// 更新後はホーム画面へリダイレクト
 		}
