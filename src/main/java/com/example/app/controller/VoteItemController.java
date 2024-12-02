@@ -1,5 +1,6 @@
 package com.example.app.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.dao.DuplicateKeyException;
@@ -72,6 +73,10 @@ public class VoteItemController {
 		model.addAttribute("voteItems", voteItems);
 		//新規投票作成用フォーム
 		model.addAttribute("voteItem", new VoteItem());
+		
+		//投票期間が終了したかを判定、モデルに情報を渡す
+		LocalDate today = LocalDate.now();
+		model.addAttribute("today", today);
 
 		return "home";
 	}
