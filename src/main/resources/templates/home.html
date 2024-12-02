@@ -52,18 +52,18 @@
 					<form th:action="@{/vote}" method="post">
 						<input type="hidden" name="voteItemId" th:value="${voteItem.voteItemId}">
 						<input type="hidden" name="voteValue" value="1"> <!-- 賛成にセット -->
-						<button type="submit">賛成</button>
+						<button type="submit" th:disabled="${voteItem.votingEnd.isBefore(today)}">賛成</button>
 					</form>
 
 					<form th:action="@{/vote}" method="post">
 						<input type="hidden" name="voteItemId" th:value="${voteItem.voteItemId}">
 						<input type="hidden" name="voteValue" value="-1"> <!-- 反対にセット -->
-						<button type="submit">反対</button>
+						<button type="submit" th:disabled="${voteItem.votingEnd.isBefore(today)}">反対</button>
 					</form>
 				</td>
 				<td>
-					<!-- 更新ボタン：モーダル表示のトリガー（自分の投稿にのみ表示） -->
-					<div th:if="${userId == voteItem.createdBy}">
+					<!-- 更新ボタン：モーダル表示のトリガー（自分の投稿にのみ表示） : 投票期間中のみ表示 -->
+					<div th:if="${userId == voteItem.createdBy && voteItem.votingEnd.isAfter(today)}">
 						<button class="btn btn-primary" data-toggle="modal" data-target="#updateModal"
 							onclick="setUpdateFormData(${voteItem.voteItemId}, '${voteItem.title}', '${voteItem.description}', '${#temporals.format(voteItem.votingStart, 'yyyy-MM-dd')}', '${#temporals.format(voteItem.votingEnd, 'yyyy-MM-dd')}')">更新</button>
 					</div>
