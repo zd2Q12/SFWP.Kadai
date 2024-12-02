@@ -27,7 +27,7 @@
 
 	<!-- 投票アイテム一覧 -->
 	<h2>投票アイテム一覧</h2>
-	<table>
+	<table border="1">
 		<thead>
 			<tr>
 				<th>タイトル</th>
@@ -46,26 +46,28 @@
 				<td th:text="${voteItem.agreeCount}">0</td>
 				<td th:text="${voteItem.disagreeCount}">0</td>
 				<td th:text="${#temporals.format(voteItem.votingStart, 'yyyy-MM-dd')}">開始日</td>
-				<td th:text="${#temporals.format(voteItem.votingStart, 'yyyy-MM-dd')}">終了日</td>
+				<td th:text="${#temporals.format(voteItem.votingEnd, 'yyyy-MM-dd')}">終了日</td>
 				<td>
 					<!-- 賛成・反対ボタン（他のユーザーの投稿にのみ表示） -->
 					<form th:action="@{/vote}" method="post">
 						<input type="hidden" name="voteItemId" th:value="${voteItem.voteItemId}">
 						<input type="hidden" name="voteValue" value="1"> <!-- 賛成にセット -->
-						<button type="submit" th:disabled="${voteItem.votingEnd.isBefore(today)}">賛成</button>
+						<button type="submit"
+							th:disabled="${voteItem.votingStart.isAfter(today) || voteItem.votingEnd.isBefore(today)}">賛成</button>
 					</form>
 
 					<form th:action="@{/vote}" method="post">
 						<input type="hidden" name="voteItemId" th:value="${voteItem.voteItemId}">
 						<input type="hidden" name="voteValue" value="-1"> <!-- 反対にセット -->
-						<button type="submit" th:disabled="${voteItem.votingEnd.isBefore(today)}">反対</button>
+						<button type="submit"
+							th:disabled="${voteItem.votingStart.isAfter(today) || voteItem.votingEnd.isBefore(today)}">反対</button>
 					</form>
 				</td>
 				<td>
 					<!-- 更新ボタン：モーダル表示のトリガー（自分の投稿にのみ表示） : 投票期間中のみ表示 -->
 					<div th:if="${userId == voteItem.createdBy && voteItem.votingEnd.isAfter(today)}">
 						<button class="btn btn-primary" data-toggle="modal" data-target="#updateModal"
-							onclick="setUpdateFormData(${voteItem.voteItemId}, '${voteItem.title}', '${voteItem.description}', '${#temporals.format(voteItem.votingStart, 'yyyy-MM-dd')}', '${#temporals.format(voteItem.votingEnd, 'yyyy-MM-dd')}')">更新</button>
+							onclick="setUpdateFormData(${voteItem.voteItemId}, '${voteItem.title}', '${voteItem.description}', '${#temporals.format(voteItem.votingStart, 'yyyy-MM-dd\'T\'HH:mm')}', '${#temporals.format(voteItem.votingEnd, 'yyyy-MM-dd\'T\'HH:mm')}')">更新</button>
 					</div>
 				</td>
 				<td>
@@ -117,10 +119,7 @@
 				<div class="modal-body">
 					<form th:action="@{/home}" method="post">
 						<input type="hidden" name="action" value="update">
-						<div>
-							<label for="updateId">投票アイテムID:</label>
-							<input type="number" id="updateId" name="id" required readonly>
-						</div>
+						<input type="hidden" id="updateId" name="voteItemId">
 						<div>
 							<label for="updateTitle">タイトル:</label>
 							<input type="text" id="updateTitle" name="title" required>
@@ -131,11 +130,11 @@
 						</div>
 						<div>
 							<label for="updateVotingStart">投票開始:</label>
-							<input type="date" id="updateVotingStart" name="votingStart" required>
+							<input type="datetime-local" id="updateVotingStart" name="votingStart" required>
 						</div>
 						<div>
 							<label for="updateVotingEnd">投票終了:</label>
-							<input type="date" id="updateVotingEnd" name="votingEnd" required>
+							<input type="datetime-local" id="updateVotingEnd" name="votingEnd" required>
 						</div>
 						<button type="submit" class="btn btn-primary">投票アイテムを更新</button>
 					</form>
@@ -174,6 +173,8 @@
 			document.getElementById('updateId').value = id;
 			document.getElementById('updateTitle').value = title;
 			document.getElementById('updateDescription').value = description;
+
+			//"yyyy-MM-dd"T'HH:mm'形式に変換して設定
 			document.getElementById('updateVotingStart').value = votingStart;
 			document.getElementById('updateVotingEnd').value = votingEnd;
 		}
