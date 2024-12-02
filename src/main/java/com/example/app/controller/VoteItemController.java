@@ -9,7 +9,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -112,14 +111,6 @@ public class VoteItemController {
 			voteItemmapper.deleteVoteItem(id);
 		}
 		return "redirect:/home";
-	}
-	
-	//削除処理用のGetメソッド追加
-	@GetMapping("deleteVoteItem/{id}")
-	public String deleteVoteItem(@PathVariable Integer id) {
-		//削除処理
-		voteItemmapper.deleteVoteItem(id);
-		return "redirect:/home";//削除したらHomeへリダイレクト
 	}
 
 	//投票結果の追加処理
