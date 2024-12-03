@@ -25,6 +25,15 @@ public interface VoteItemMapper {
 	//削除
 	void deleteVoteItem(int id);
 	
+  // 日付順（新しい順）
+  List<VoteItem> selectAllOrderByDateDesc();
+
+  // 日付順（古い順）
+  List<VoteItem> selectAllOrderByDateAsc();
+  
+  // 自分の投稿のみ
+  List<VoteItem> selectByUserId(Integer userId);
+	
 	//追加：vote_resultsのvote_result_idが必要
 	Integer addVoteResult(VoteResult voteResult);
 	
