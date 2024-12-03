@@ -25,6 +25,15 @@
 		<p th:text="${errorMessage}"></p>
 	</div>
 
+	<!--並び替えプルダウン-->
+	<form action="" method="get">
+		<select name="sortBy" onchange="this.form.submit()">
+			<option value="dateDesc" th:selected="${sortBy == 'dateDesc'}">新しい順</option>
+			<option value="dateAsc" th:selected="${sortBy == 'dateAsc'}">古い順</option>
+			<option value="myPosts" th:selected="${sortBy == 'myPosts'}">自分の投稿</option>
+		</select>
+	</form>
+
 	<!-- 投票アイテム一覧 -->
 	<h2>投票アイテム一覧</h2>
 	<table border="1">
