@@ -74,5 +74,21 @@
 		WHERE vote_item_id = #{voteItemId} AND user_id = #{userId}
 		LIMIT 1
 	</select>
+	
+	<!-- 日付順（新しい順） -->
+<select id="selectAllOrderByDateDesc" resultType="VoteItem">
+    SELECT * FROM vote_items ORDER BY created_at DESC
+</select>
+
+<!-- 日付順（古い順） -->
+<select id="selectAllOrderByDateAsc" resultType="VoteItem">
+    SELECT * FROM vote_items ORDER BY created_at ASC
+</select>
+
+<!-- 自分の投稿のみ -->
+<select id="selectByUserId" resultType="VoteItem">
+    SELECT * FROM vote_items WHERE created_by = #{userId}
+</select>
+	
 
 </mapper>
