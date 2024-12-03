@@ -72,17 +72,16 @@
 							th:disabled="${voteItem.votingStart.isAfter(today) || voteItem.votingEnd.isBefore(today)}">反対</button>
 					</form>
 				</td>
+				<!-- 更新ボタン：別のページへ遷移 -->
 				<td>
-					<!-- 更新ボタン：モーダル表示のトリガー（自分の投稿にのみ表示） : 投票期間中のみ表示 -->
 					<div th:if="${userId == voteItem.createdBy && voteItem.votingEnd.isAfter(today)}">
-						<button class="btn btn-primary" data-toggle="modal" data-target="#updateModal"
-							onclick="setUpdateFormData(${voteItem.voteItemId}, '${voteItem.title}', '${voteItem.description}', '${#temporals.format(voteItem.votingStart, 'yyyy-MM-dd\'T\'HH:mm')}', '${#temporals.format(voteItem.votingEnd, 'yyyy-MM-dd\'T\'HH:mm')}')">更新</button>
+						<a th:href="@{/update/{id}(id=${voteItem.voteItemId})}">更新</a>
 					</div>
 				</td>
+				<!-- 削除ボタン：削除確認ページへ遷移 -->
 				<td>
-					<!-- 削除ボタン：確認ポップアップ （自分の投稿にのみ表示）-->
 					<div th:if="${userId == voteItem.createdBy}">
-						<button class="btn btn-danger" onclick="confirmDelete(${voteItem.voteItemId})">削除</button>
+						<a th:href="@{/delete/{id}(id=${voteItem.voteItemId})}">削除</a>
 					</div>
 				</td>
 
@@ -114,87 +113,7 @@
 		</div>
 		<button type="submit">投票アイテムを作成</button>
 	</form>
-	<!-- 更新フォームモーダル -->
-	<div class="modal fade" id="updateModal" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel"
-		aria-hidden="true">
-		<div class="modal-dialog" role="document">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="updateModalLabel">投票アイテム更新</h5>
-					<button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
-						<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
-				<div class="modal-body">
-					<form th:action="@{/home}" method="post">
-						<input type="hidden" name="action" value="update">
-						<input type="hidden" id="updateId" name="voteItemId">
-						<div>
-							<label for="updateTitle">タイトル:</label>
-							<input type="text" id="updateTitle" name="title" required>
-						</div>
-						<div>
-							<label for="updateDescription">説明:</label>
-							<textarea id="updateDescription" name="description" required></textarea>
-						</div>
-						<div>
-							<label for="updateVotingStart">投票開始:</label>
-							<input type="datetime-local" id="updateVotingStart" name="votingStart" required>
-						</div>
-						<div>
-							<label for="updateVotingEnd">投票終了:</label>
-							<input type="datetime-local" id="updateVotingEnd" name="votingEnd" required>
-						</div>
-						<button type="submit" class="btn btn-primary">投票アイテムを更新</button>
-					</form>
-				</div>
-			</div>
-		</div>
-	</div>
 
-	<!-- 削除確認ポップアップ -->
-	<div id="deleteConfirmation" class="modal" tabindex="-1" role="dialog">
-		<div class="modal-dialog" role="document">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title">削除確認</h5>
-					<button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
-						<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
-				<div class="modal-body">
-					<p>本当に削除してもよろしいですか？</p>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">キャンセル</button>
-					<form id="deleteForm" method="post" style="display: inline;">
-						<input type="hidden" name="action" value="delete">
-						<input type="hidden" name="id" id="deleteItemId">
-						<button type="submit" class="btn btn-danger">削除</button>
-					</form>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<script>
-		function setUpdateFormData(id, title, description, votingStart, votingEnd) {
-			document.getElementById('updateId').value = id;
-			document.getElementById('updateTitle').value = title;
-			document.getElementById('updateDescription').value = description;
-
-			//"yyyy-MM-dd"T'HH:mm'形式に変換して設定
-			document.getElementById('updateVotingStart').value = votingStart;
-			document.getElementById('updateVotingEnd').value = votingEnd;
-		}
-
-		function confirmDelete(voteItemId) {
-			// 削除するIDをhiddenフィールドに設定
-			document.getElementById('deleteItemId').value = voteItemId;
-			// モーダルを表示
-			$('#deleteConfirmation').modal('show');
-		}
-	</script>
 </body>
 
 </html>

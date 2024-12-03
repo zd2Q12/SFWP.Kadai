@@ -14,7 +14,7 @@ public interface VoteItemMapper {
 	List<VoteItem> selectAll();
 	
 	//個別取得
-	VoteItem getVoteItemById(int id);
+	VoteItem getVoteItemById(int voteItemId);
 	
 	//追加
 	void addVoteItem(VoteItem voteItem);
@@ -23,7 +23,7 @@ public interface VoteItemMapper {
 	void updateVoteItem(VoteItem voteItem);
 	
 	//削除
-	void deleteVoteItem(int id);
+	void deleteVoteItem(int voteItemId);
 	
   // 日付順（新しい順）
   List<VoteItem> selectAllOrderByDateDesc();

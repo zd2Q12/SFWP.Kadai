@@ -4,18 +4,17 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.app.domain.User;
 import com.example.app.domain.VoteItem;
-import com.example.app.domain.VoteResult;
 import com.example.app.mapper.VoteItemMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,40 +27,40 @@ public class VoteItemController {
 
 	private final VoteItemMapper voteItemmapper;
 
-  // すべてのリクエストで共通のユーザー情報を取得
-  @ModelAttribute("user")
-  public User getUser(HttpServletRequest request,Model model) {
-      HttpSession session = request.getSession();
-      User loggedInUser = (User) session.getAttribute("user");
-      
-      // ログインしていない場合、カスタム例外をスローしてリダイレクトさせる
-      if (loggedInUser == null) {
-      	throw new RedirectToLoginException();
-      }
-    	//ユーザー情報をモデルに追加・表示
-  			model.addAttribute("userName", loggedInUser.getUserName());
-  			model.addAttribute("userId", loggedInUser.getUserId());
-  	
+	// すべてのリクエストで共通のユーザー情報を取得
+	@ModelAttribute("user")
+	public User getUser(HttpServletRequest request, Model model) {
+		HttpSession session = request.getSession();
+		User loggedInUser = (User) session.getAttribute("user");
 
-      return loggedInUser; // ログインしている場合はそのユーザー情報を返す
-  }
+		// ログインしていない場合、カスタム例外をスローしてリダイレクトさせる
+		if (loggedInUser == null) {
+			System.out.println("ユーザーがログインしていません");
+			throw new RedirectToLoginException();
+		}
+		//ユーザー情報をモデルに追加・表示
+		model.addAttribute("userName", loggedInUser.getUserName());
+		model.addAttribute("userId", loggedInUser.getUserId());
+System.out.println("ログインユーザー：" + loggedInUser.getUserName());
+		return loggedInUser; // ログインしている場合はそのユーザー情報を返す
+	}
 
-  // ログインしていない場合にリダイレクトさせるための例外クラス
-  public static class RedirectToLoginException extends RuntimeException {}
+	// ログインしていない場合にリダイレクトさせるための例外クラス
+	public static class RedirectToLoginException extends RuntimeException {
+	}
 
-  // 例外ハンドラーでリダイレクト処理
-  @ExceptionHandler(RedirectToLoginException.class)
-  public String handleRedirectToLogin() {
-      return "redirect:/login"; // ログイン画面へ遷移
-    }
-  
-	
+	// 例外ハンドラーでリダイレクト処理
+	@ExceptionHandler(RedirectToLoginException.class)
+	public String handleRedirectToLogin() {
+		return "redirect:/login"; // ログイン画面へ遷移
+	}
+
 	//Homeページへ遷移
 	@GetMapping("/home")
 	public String homePage(
 			@RequestParam(value = "sortBy", defaultValue = "dateDesc") String sortBy,
 			Model model) {
-    // セッションから取得したユーザー情報を自動的にモデルに追加
+		// セッションから取得したユーザー情報を自動的にモデルに追加
 		User user = (User) model.getAttribute("user");
 
 		//ユーザー情報をモデルに追加・表示
@@ -72,7 +71,7 @@ public class VoteItemController {
 
 		//全ての投票を取得（並び替え条件に応じて）
 		List<VoteItem> voteItems = new ArrayList<>();
-		switch(sortBy) {
+		switch (sortBy) {
 		case "dateAsc":
 			voteItems = voteItemmapper.selectAllOrderByDateAsc();
 			break;
@@ -80,20 +79,21 @@ public class VoteItemController {
 			voteItems = voteItemmapper.selectByUserId(user.getUserId());
 			break;
 		case "dateDesc":
-			default:
-				voteItems = voteItemmapper.selectAllOrderByDateDesc();
-				break;
-	}
-		
+		default:
+			voteItems = voteItemmapper.selectAllOrderByDateDesc();
+			break;
+		}
+
 		// 投票アイテムのリストをビューに渡す
 		model.addAttribute("voteItems", voteItems);
+
 		//新規投票作成用フォーム
 		model.addAttribute("voteItem", new VoteItem());
-		
+
 		//投票期間が終了したかを判定、モデルに情報を渡す
 		LocalDateTime today = LocalDateTime.now();
 		model.addAttribute("today", today);
-		
+
 		//プルダウンの選択状態を保持
 		model.addAttribute("sortBy", sortBy);
 
@@ -106,79 +106,71 @@ public class VoteItemController {
 			@RequestParam("action") String action,
 			VoteItem voteItem,
 			@RequestParam(value = "id", required = false) Integer id,
-			@ModelAttribute("user")User user) {
+			@ModelAttribute("user") User user) {
 
 		// ユーザーがセッションにいない場合
 		if (user == null) {
+      System.out.println("User is not logged in.");
 			return "redirect:/login"; // ログインしていなければリダイレクト
 		}
 
 		// セッションから取得したUserオブジェクトからユーザーIDを取得
 		Integer userId = user.getUserId();
+		System.out.println("User ID:" + userId);
 
-		// action に基づいて処理を分岐
+		// action に基づいて新規投稿作成
 		if ("create".equals(action)) {
 			//新規作成
 			voteItem.setCreatedBy(userId);
 			voteItemmapper.addVoteItem(voteItem);
-		} else if ("update".equals(action)) {
-			// 更新
-			voteItem.setVoteItemId(id);//対象のIDセット
-			voteItemmapper.updateVoteItem(voteItem);
-		} else if ("delete".equals(action) && id != null) {
-			//削除
-			voteItemmapper.deleteVoteItem(id);
-		}
+			System.out.println("新規投票作成：" + voteItem.getTitle());
+		} 
 		return "redirect:/home";
 	}
 
-	//投票結果の追加処理
-	@PostMapping("/vote")
-	public String vote(
-			@RequestParam("voteItemId") Integer voteItemId,
-			@RequestParam("voteValue") Integer voteValue,
-			@ModelAttribute("user")User user,
-			Model model) {
+	// 更新画面への遷移（新規追加）
+	@GetMapping("/update/{id}")
+	public String updateVoteItemForm(@PathVariable Integer id, Model model) {
+		// 対象の投票アイテムを取得
+		VoteItem voteItem = voteItemmapper.getVoteItemById(id);
+		model.addAttribute("voteItem", voteItem);
+		return "updateVoteItem"; // 更新用のビュー
+	}
 
-		if (user == null) {
-      model.addAttribute("errorMessage", "ログインしていないため投票できません。");
-			return "redirect:/login";//ログインしてなかったらリダイレクト
+	// 更新処理（新規追加）
+	@PostMapping("/update/{id}")
+	public String updateVoteItem(
+			@PathVariable Integer id,
+			@ModelAttribute VoteItem voteItem,
+			@ModelAttribute("user") User user) {
+		// ユーザーIDをセットして更新
+		voteItem.setVoteItemId(id);
+		voteItem.setCreatedBy(user.getUserId());
+		voteItemmapper.updateVoteItem(voteItem);
+		return "redirect:/home"; // 更新後はホームにリダイレクト
+	}
+
+	// 削除確認画面への遷移（新規追加）
+	@GetMapping("/delete/{voteItemId}")
+	public String deleteVoteItemConfirmation(@PathVariable Integer voteItemId, Model model) {
+		System.out.println("削除する投稿の取得：" + voteItemId);
+		// 対象の投票アイテムを取得
+		VoteItem voteItem = voteItemmapper.getVoteItemById(voteItemId);
+		if(voteItem == null) {
+			System.out.println("投稿が見つかりません：" + voteItemId);
+			return "home";
 		}
-		
-    // すでに投票しているかチェック
-    VoteResult existingVote = voteItemmapper.findVoteResultByUserIdAndVoteItemId(user.getUserId(), voteItemId);
-    if (existingVote != null) {
-        // 投票済みの場合、エラーメッセージを渡す
-        model.addAttribute("errorMessage", "すでに投票済みです。");
-        // 投票アイテムのリストを再取得
-        List<VoteItem> voteItems = voteItemmapper.selectAll();
-        model.addAttribute("voteItems", voteItems);
-        return "home"; // ホーム画面に戻る
-    }
+		model.addAttribute("voteItem", voteItem);
+		return "deleteVoteItem"; // 削除確認用のビュー
+	}
 
-		// VoteResult オブジェクトを作成して、投票結果を保存(投票結果を新規に追加)
-		VoteResult voteResult = new VoteResult();
-		voteResult.setVoteItemId(voteItemId);
-		voteResult.setUserId(user.getUserId());
-		voteResult.setVoteValue(voteValue);
-
-
-    // 投票結果をデータベースに挿入
-		//重複した投票防止
-    try {
-        voteItemmapper.addVoteResult(voteResult);  // ここで重複チェックが行われる
-    } catch (DuplicateKeyException e) {
-        // 重複エラーが発生した場合、エラーメッセージを表示
-        model.addAttribute("errorMessage", "すでに投票済みです。");
-        List<VoteItem> voteItems = voteItemmapper.selectAll();
-        model.addAttribute("voteItems", voteItems);
-        return "home"; // ホーム画面に戻る
-    }
-
-		//投票後に、賛成・反対票数を更新
-		voteItemmapper.updateVoteCount(voteItemId);
-
-		return "redirect:/home"; // 投票済みならそのままリダイレクト
+	// 削除処理（新規追加）
+	@PostMapping("/delete/{voteItemId}")
+	public String deleteVoteItem(@PathVariable Integer voteItemId) {
+		System.out.println("削除完了する投稿の取得：" + voteItemId);
+    VoteItem voteItem = voteItemmapper.getVoteItemById(voteItemId);
+    System.out.println("取得した投票アイテム：" + voteItem); // 確認用ログ
+		return "redirect:/home"; // 削除後はホームにリダイレクト
 	}
 
 }
