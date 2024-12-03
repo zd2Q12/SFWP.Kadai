@@ -1,6 +1,7 @@
 package com.example.app.controller;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.dao.DuplicateKeyException;
@@ -57,7 +58,9 @@ public class VoteItemController {
 	
 	//Homeページへ遷移
 	@GetMapping("/home")
-	public String homePage(Model model) {
+	public String homePage(
+			@RequestParam(value = "sortBy", defaultValue = "dateDesc") String sortBy,
+			Model model) {
     // セッションから取得したユーザー情報を自動的にモデルに追加
 		User user = (User) model.getAttribute("user");
 
@@ -67,8 +70,21 @@ public class VoteItemController {
 			model.addAttribute("userId", user.getUserId());
 		}
 
-		//全ての投票を取得（他のユーザーの投稿を表示）
-		List<VoteItem> voteItems = voteItemmapper.selectAll();
+		//全ての投票を取得（並び替え条件に応じて）
+		List<VoteItem> voteItems = new ArrayList<>();
+		switch(sortBy) {
+		case "dateAsc":
+			voteItems = voteItemmapper.selectAllOrderByDateAsc();
+			break;
+		case "myPosts":
+			voteItems = voteItemmapper.selectByUserId(user.getUserId());
+			break;
+		case "dateDesc":
+			default:
+				voteItems = voteItemmapper.selectAllOrderByDateDesc();
+				break;
+	}
+		
 		// 投票アイテムのリストをビューに渡す
 		model.addAttribute("voteItems", voteItems);
 		//新規投票作成用フォーム
@@ -77,6 +93,9 @@ public class VoteItemController {
 		//投票期間が終了したかを判定、モデルに情報を渡す
 		LocalDateTime today = LocalDateTime.now();
 		model.addAttribute("today", today);
+		
+		//プルダウンの選択状態を保持
+		model.addAttribute("sortBy", sortBy);
 
 		return "home";
 	}
