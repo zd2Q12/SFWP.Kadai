@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<h2>削除確認</h2>
+<p>本当に「<span th:text="${voteItem.title}"></span>」を削除しますか</p>
+<form th:action="@{/delete/{voteItemId}(voteItemId=${voteItem.voteItemId})}" method="post">
+	<button type="submit">削除</button>
+</form>
+<a href="/home">キャンセル</a>
+</body>
+</html>
