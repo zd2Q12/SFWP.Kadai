@@ -12,9 +12,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.app.domain.User;
 import com.example.app.domain.VoteItem;
+import com.example.app.domain.VoteResult;
 import com.example.app.mapper.VoteItemMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,7 +43,6 @@ public class VoteItemController {
 		//ユーザー情報をモデルに追加・表示
 		model.addAttribute("userName", loggedInUser.getUserName());
 		model.addAttribute("userId", loggedInUser.getUserId());
-System.out.println("ログインユーザー：" + loggedInUser.getUserName());
 		return loggedInUser; // ログインしている場合はそのユーザー情報を返す
 	}
 
@@ -59,15 +60,10 @@ System.out.println("ログインユーザー：" + loggedInUser.getUserName());
 	@GetMapping("/home")
 	public String homePage(
 			@RequestParam(value = "sortBy", defaultValue = "dateDesc") String sortBy,
+			@ModelAttribute("user") User user,
 			Model model) {
 		// セッションから取得したユーザー情報を自動的にモデルに追加
-		User user = (User) model.getAttribute("user");
-
-		//ユーザー情報をモデルに追加・表示
-		if (user != null) {
-			model.addAttribute("userName", user.getUserName());
-			model.addAttribute("userId", user.getUserId());
-		}
+		//User user = (User) model.getAttribute("user");
 
 		//全ての投票を取得（並び替え条件に応じて）
 		List<VoteItem> voteItems = new ArrayList<>();
@@ -110,7 +106,7 @@ System.out.println("ログインユーザー：" + loggedInUser.getUserName());
 
 		// ユーザーがセッションにいない場合
 		if (user == null) {
-      System.out.println("User is not logged in.");
+			System.out.println("User is not logged in.");
 			return "redirect:/login"; // ログインしていなければリダイレクト
 		}
 
@@ -168,9 +164,54 @@ System.out.println("ログインユーザー：" + loggedInUser.getUserName());
 	@PostMapping("/delete/{voteItemId}")
 	public String deleteVoteItem(@PathVariable Integer voteItemId) {
 		System.out.println("削除完了する投稿の取得：" + voteItemId);
-    VoteItem voteItem = voteItemmapper.getVoteItemById(voteItemId);
-    System.out.println("取得した投票アイテム：" + voteItem); // 確認用ログ
+		voteItemmapper.deleteVoteItem(voteItemId);
 		return "redirect:/home"; // 削除後はホームにリダイレクト
 	}
 
+	//投票処理
+	@PostMapping("/vote")
+	public String vote(
+			@RequestParam("voteItemId") Integer voteItemId,
+			@RequestParam("voteValue") Integer voteValue,
+			@ModelAttribute("user") User user,
+			RedirectAttributes redirectAttributes) {
+		//ユーザーが投票したアイテム取得
+		VoteItem voteItem = voteItemmapper.getVoteItemById(voteItemId);
+		if (voteItem == null) {
+			System.out.println("投票アイテムを取得できませんでした");
+			return "redirect:/home";
+		}
+		
+		//重複投票防止のために、すでに投票しているか確認
+		System.out.println("投票ID: " + voteItemId + " ユーザーID: " + user.getUserId());
+		VoteResult voteResult = voteItemmapper.findVoteResultByUserIdAndVoteItemId(voteItemId, user.getUserId());
+		System.out.println("取得した投票結果: " + voteResult);
+		if(voteResult != null) {
+	    System.out.println("すでに投票しています。voteResult: " + voteResult);
+      // ユーザーがすでに投票している場合、エラーメッセージをモデルに追加
+			redirectAttributes.addFlashAttribute("errorMessage", "すでに投票済みです");
+			return "redirect:/home";
+		}
+		//投票してなかったら、新しい投票結果を保存
+		VoteResult newVoteResult = new VoteResult();
+		System.out.println("新しい投票結果:" + newVoteResult);
+		newVoteResult.setVoteItemId(voteItemId);
+		newVoteResult.setUserId(user.getUserId());
+		newVoteResult.setVoteValue(voteValue);
+		voteItemmapper.addVoteResult(newVoteResult);
+		
+		
+		//賛成・反対の票を更新
+		if (voteValue == 1) {
+			voteItem.setAgreeCount(voteItem.getAgreeCount() + 1);
+		} else if (voteValue == -1) {
+			voteItem.setDisagreeCount(voteItem.getDisagreeCount() + 1);
+		}
+	
+
+		//投票結果を保存
+		voteItemmapper.updateVoteItem(voteItem);
+		System.out.println("賛成・反対票が更新されました：" + voteItem);
+		return "redirect:/home";
+	}
 }
