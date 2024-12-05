@@ -45,7 +45,6 @@
 				<th>投票開始</th>
 				<th>投票終了</th>
 				<th>アクション</th>
-				<th>更新</th>
 				<th>削除</th>
 			</tr>
 		</thead>
@@ -71,12 +70,6 @@
 						<button type="submit"
 							th:disabled="${voteItem.votingStart.isAfter(today) || voteItem.votingEnd.isBefore(today)}">反対</button>
 					</form>
-				</td>
-				<!-- 更新ボタン：別のページへ遷移 -->
-				<td>
-					<div th:if="${userId == voteItem.createdBy && voteItem.votingEnd.isAfter(today)}">
-						<a th:href="@{/update/{id}(id=${voteItem.voteItemId})}">更新</a>
-					</div>
 				</td>
 				<!-- 削除ボタン：削除確認ページへ遷移 -->
 				<td>
