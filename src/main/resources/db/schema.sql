@@ -33,6 +33,9 @@ CREATE TABLE vote_items (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (created_by) REFERENCES users(user_id)  -- 外部キー制約
 );
+ALTER TABLE vote_items DROP COLUMN updated_at;
+
+
 CREATE TABLE vote_results (
     vote_result_id INT AUTO_INCREMENT PRIMARY KEY,  -- 結果ID
     user_id INT NOT NULL,                           -- ユーザーID
