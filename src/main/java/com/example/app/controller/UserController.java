@@ -118,48 +118,49 @@ public class UserController {
 	//ユーザーの更新・削除
 	@PostMapping("/updateUser")
 	public String updateUser(
-			@Validated(AddUserGroup.class)  User user,
+			@Validated(AddUserGroup.class) User user,
 			Errors errors,
 			Model model,
 			HttpServletRequest request,
-			@RequestParam(required = false)String action) {
-		
+			@RequestParam(required = false) String action) {
+
 		//セッションからユーザー情報取得
 		User loggedInUser = (User) request.getSession().getAttribute("user");
 
 		if (loggedInUser == null) {
 			return "redirect:/login";
 		}
-		
+
 		//削除ボタンが押された場合
-		if("delete".equals(action)) {
+		if ("delete".equals(action)) {
 			userMapper.deleteUser(loggedInUser.getUserId());
-			
+
 			//セッションを無効か
 			request.getSession().invalidate();
 			return "redirect:/login";//削除-＞ログインページへ
 		}
-		
-		//更新
-		// 入力エラーがあれば、エラーメッセージを表示
-		if (errors.hasErrors()) {
-			List<ObjectError> objList = errors.getAllErrors();
-			for (ObjectError obj : objList) {
-				System.out.println(obj.toString());
+
+		//更新ボタンが押された場合
+		if ("update".equals(action)) {
+			// 入力エラーがあれば、エラーメッセージを表示
+			if (errors.hasErrors()) {
+				List<ObjectError> objList = errors.getAllErrors();
+				for (ObjectError obj : objList) {
+					System.out.println(obj.toString());
+				}
+				model.addAttribute("user", loggedInUser);// フォームに現在のデータを保持
+				return "updateUser";// エラーがあれば、更新ページを再表示
+			} else {
+				//ユーザー情報を更新
+				user.setUserId(loggedInUser.getUserId());// セッションのユーザーIDを更新対象に設定
+				userMapper.updateUser(user);//DBへ保存
+
+				//更新後にセッション情報も更新
+				request.getSession().setAttribute("user", user);
+				model.addAttribute("message", "ユーザー情報を更新しました");
+				return "redirect:/home";// 更新後はホーム画面へリダイレクト
 			}
-			model.addAttribute("user", loggedInUser);// フォームに現在のデータを保持
-			return "updateUser";// エラーがあれば、更新ページを再表示
-		} else {
-			//ユーザー情報を更新
-			user.setUserId(loggedInUser.getUserId());// セッションのユーザーIDを更新対象に設定
-			userMapper.updateUser(user);//DBへ保存
-
-			//更新後にセッション情報も更新
-			request.getSession().setAttribute("user", user);
-			model.addAttribute("message", "ユーザー情報を更新しました");
-			return "redirect:/home";// 更新後はホーム画面へリダイレクト
 		}
-
+		return "redirect:/home"; // アクションが不明な場合、ホームページへリダイレクト
 	}
-
 }
