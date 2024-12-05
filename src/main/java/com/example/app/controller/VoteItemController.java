@@ -96,7 +96,7 @@ public class VoteItemController {
 		return "home";
 	}
 
-	//投票の新規作成・変更更新・削除
+	//投票の新規作成
 	@PostMapping("/home")
 	public String createVoteItem(
 			@RequestParam("action") String action,
@@ -123,30 +123,8 @@ public class VoteItemController {
 		} 
 		return "redirect:/home";
 	}
-
-	// 更新画面への遷移（新規追加）
-	@GetMapping("/update/{id}")
-	public String updateVoteItemForm(@PathVariable Integer id, Model model) {
-		// 対象の投票アイテムを取得
-		VoteItem voteItem = voteItemmapper.getVoteItemById(id);
-		model.addAttribute("voteItem", voteItem);
-		return "updateVoteItem"; // 更新用のビュー
-	}
-
-	// 更新処理（新規追加）
-	@PostMapping("/update/{id}")
-	public String updateVoteItem(
-			@PathVariable Integer id,
-			@ModelAttribute VoteItem voteItem,
-			@ModelAttribute("user") User user) {
-		// ユーザーIDをセットして更新
-		voteItem.setVoteItemId(id);
-		voteItem.setCreatedBy(user.getUserId());
-		voteItemmapper.updateVoteItem(voteItem);
-		return "redirect:/home"; // 更新後はホームにリダイレクト
-	}
-
-	// 削除確認画面への遷移（新規追加）
+	
+	// 削除確認画面への遷移
 	@GetMapping("/delete/{voteItemId}")
 	public String deleteVoteItemConfirmation(@PathVariable Integer voteItemId, Model model) {
 		System.out.println("削除する投稿の取得：" + voteItemId);
@@ -160,7 +138,7 @@ public class VoteItemController {
 		return "deleteVoteItem"; // 削除確認用のビュー
 	}
 
-	// 削除処理（新規追加）
+	// 削除処理
 	@PostMapping("/delete/{voteItemId}")
 	public String deleteVoteItem(@PathVariable Integer voteItemId) {
 		System.out.println("削除完了する投稿の取得：" + voteItemId);
@@ -187,7 +165,6 @@ public class VoteItemController {
 		VoteResult voteResult = voteItemmapper.findVoteResultByUserIdAndVoteItemId(voteItemId, user.getUserId());
 		System.out.println("取得した投票結果: " + voteResult);
 		if(voteResult != null) {
-	    System.out.println("すでに投票しています。voteResult: " + voteResult);
       // ユーザーがすでに投票している場合、エラーメッセージをモデルに追加
 			redirectAttributes.addFlashAttribute("errorMessage", "すでに投票済みです");
 			return "redirect:/home";
@@ -200,17 +177,9 @@ public class VoteItemController {
 		newVoteResult.setVoteValue(voteValue);
 		voteItemmapper.addVoteResult(newVoteResult);
 		
-		
-		//賛成・反対の票を更新
-		if (voteValue == 1) {
-			voteItem.setAgreeCount(voteItem.getAgreeCount() + 1);
-		} else if (voteValue == -1) {
-			voteItem.setDisagreeCount(voteItem.getDisagreeCount() + 1);
-		}
-	
 
 		//投票結果を保存
-		voteItemmapper.updateVoteItem(voteItem);
+		voteItemmapper.updateVoteCount(voteItemId);
 		System.out.println("賛成・反対票が更新されました：" + voteItem);
 		return "redirect:/home";
 	}
