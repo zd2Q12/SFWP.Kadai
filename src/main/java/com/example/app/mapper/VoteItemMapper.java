@@ -19,9 +19,6 @@ public interface VoteItemMapper {
 	//追加
 	void addVoteItem(VoteItem voteItem);
 	
-	//更新
-	void updateVoteItem(VoteItem voteItem);
-	
 	//削除
 	void deleteVoteItem(int voteItemId);
 	
