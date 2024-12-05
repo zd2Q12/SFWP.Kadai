@@ -24,7 +24,7 @@ public interface UserMapper {
 	void updateUser(User user);
 	
 	//削除(Delete)
-	void deleteUser(int id);
+	void deleteUser(int userId);
 	
 	//追加：vote_itemsのvote_item_idが必要
 	Integer addVoteItem(VoteItem voteItem);
