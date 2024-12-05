@@ -15,6 +15,7 @@
 	</div>
 
 	<form action="" method="post" th:object="${user}">
+		<input type="hidden" th:field="*{userId}">
 		<p class="error" th:errors="*{userName}"></p>
 		<p><label for="userName">ユーザー名：</label>
 			<input type="text" th:field="*{userName}">
@@ -40,25 +41,29 @@
 			<textarea th:field="*{memo}" cols="30" rows="10"></textarea>
 		</p>
 		<!--更新ボタン-->
-		<button type="submit" class="btn btn-primary">更新</button>
+		<button type="submit" name="action" value="update">更新</button>
 		<!--削除ボタン-->
-		<button type="button" class="btn btn-danger" id="deleteButton">削除</button>
+		<button type="submit" id="deleteButton" name="action" value="delete"
+			onclick="return confirmDelete()">削除</button>
 	</form>
 	<a th:href="@{/home}">戻る</a>
 
 	<!--削除確認のポップ-->
 	<script>
-		document.getElementById('deleteButton').addEventListener('click', function () {
-			if (confirm("本当に削除してよろしいですか？"))
-				//削除ボタンが押されたら、フォームを送信して削除処理を実行
+		function confirmDelete() {
+			if (confirm("本当に削除してよろしいですか？")) {
+				// 削除のアクションが選択されたことを示す hidden フィールドをフォームに追加
 				var form = document.querySelector('form');
-			var input = document.createElement('input');
-			input.type = 'hidden';
-			input.name = 'action';
-			input.value = 'delete';
-			form.appendChild(input);
-			form.submit();
-		});
+				var input = document.createElement('input');
+				input.type = 'hidden';
+				input.name = 'action';
+				input.value = 'delete';
+				form.appendChild(input);
+				form.submit();
+			} else {
+				return false;
+			}
+		}
 	</script>
 	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
