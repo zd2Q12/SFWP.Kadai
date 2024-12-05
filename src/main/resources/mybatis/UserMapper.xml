@@ -69,8 +69,7 @@
 		#{userId}
 	</update>
 
-	<delete id="deleteUser" parameterType="User">
-		delete from users where
-		user_id = #{userId}
+	<delete id="deleteUser" parameterType="int">
+		delete from users where	user_id = #{userId}
 	</delete>
 </mapper>
