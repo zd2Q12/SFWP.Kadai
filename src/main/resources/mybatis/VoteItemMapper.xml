@@ -10,7 +10,7 @@
 		select vote_items.title, vote_items.description,
 		vote_items.created_by,
 		vote_items.voting_start,
-		vote_items.voting_end,vote_items.created_at,vote_items.updated_at,
+		vote_items.voting_end,vote_items.created_at,
 		vote_items.agree_count, vote_items.disagree_count
 		from vote_items
 		where
@@ -27,18 +27,6 @@
 		#{description}, #{createdBy}, #{votingStart}, #{votingEnd},
 		now(),#{agreeCount}, #{disagreeCount})
 	</insert>
-
-	<!-- 投票アイテムを更新 -->
-	<update id="updateVoteItem" parameterType="VoteItem">
-		update vote_items set
-		title = #{title}, description = #{description},
-		voting_start =
-		#{votingStart}, voting_end = #{votingEnd}, updated_at =
-		now(),
-		agree_count = #{agreeCount}, disagree_count = #{disagreeCount}
-		where
-		vote_item_id = #{voteItemId}
-	</update>
 
 	<delete id="deleteVoteItem" parameterType="int">
 		delete from vote_items
