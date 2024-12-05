@@ -28,9 +28,6 @@ public class VoteItem {
 
 	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
 	private LocalDateTime createdAt;
-
-	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-	private LocalDateTime updatedAt;
 	
   private Integer agreeCount = 0;  // 賛成票の数
   private Integer disagreeCount = 0;  // 反対票の数
