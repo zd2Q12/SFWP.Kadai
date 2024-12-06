@@ -17,8 +17,6 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4;
 ALTER TABLE vote_items MODIFY COLUMN created_by INT NULL;
 ALTER TABLE users ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
-ALTER TABLE vote_items ADD CONSTRAINT fk_created_by FOREIGN KEY (created_by) REFERENCES users(user_id) ON DELETE SET NULL;
-
 ALTER TABLE users DROP COLUMN role;
 
 
@@ -34,6 +32,8 @@ CREATE TABLE vote_items (
     FOREIGN KEY (created_by) REFERENCES users(user_id)  -- 外部キー制約
 );
 ALTER TABLE vote_items DROP COLUMN updated_at;
+ALTER TABLE vote_items ADD COLUMN agree_count INT DEFAULT 0, ADD COLUMN disagree_count INT DEFAULT 0;
+ALTER TABLE vote_items ADD CONSTRAINT fk_created_by FOREIGN KEY (created_by) REFERENCES users(user_id) ON DELETE SET NULL;
 
 
 CREATE TABLE vote_results (
@@ -46,6 +46,10 @@ CREATE TABLE vote_results (
     CONSTRAINT unique_vote UNIQUE (user_id, vote_item_id)  -- ユーザーと投票アイテムの組み合わせを一意にする
 );
 ALTER TABLE vote_results ADD COLUMN vote_value TINYINT NOT NULL DEFAULT 0;
-ALTER TABLE vote_items ADD COLUMN agree_count INT DEFAULT 0, ADD COLUMN disagree_count INT DEFAULT 0;
+-- 外部キー制約の修正
+ALTER TABLE vote_results DROP FOREIGN KEY vote_results_ibfk_1;
+
+ALTER TABLE vote_results
+ADD CONSTRAINT vote_results_ibfk_1 FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE;
 
 
