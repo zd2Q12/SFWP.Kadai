@@ -7,7 +7,7 @@
 
 	<select id="getVoteItemById" parameterType="int"
 		resultType="VoteItem">
-		select vote_items.title, vote_items.description,
+		select vote_items.vote_item_id, vote_items.title, vote_items.description,
 		vote_items.created_by,
 		vote_items.voting_start,
 		vote_items.voting_end,vote_items.created_at,

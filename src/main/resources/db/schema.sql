@@ -48,8 +48,8 @@ CREATE TABLE vote_results (
 ALTER TABLE vote_results ADD COLUMN vote_value TINYINT NOT NULL DEFAULT 0;
 -- 外部キー制約の修正
 ALTER TABLE vote_results DROP FOREIGN KEY vote_results_ibfk_1;
-
-ALTER TABLE vote_results
-ADD CONSTRAINT vote_results_ibfk_1 FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE;
+ALTER TABLE vote_results DROP FOREIGN KEY vote_results_ibfk_2;
+ALTER TABLE vote_results ADD CONSTRAINT vote_results_ibfk_1 FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE;
+ALTER TABLE vote_results ADD CONSTRAINT vote_results_ibfk_2 FOREIGN KEY (vote_item_id) REFERENCES vote_items(vote_item_id) ON DELETE CASCADE;
 
 
