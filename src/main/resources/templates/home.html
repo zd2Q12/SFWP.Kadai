@@ -42,6 +42,7 @@
 				<th>タイトル</th>
 				<th>賛成票</th>
 				<th>反対票</th>
+				<th>投票結果</th>
 				<th>投票開始</th>
 				<th>投票終了</th>
 				<th>アクション</th>
@@ -55,6 +56,16 @@
 				<td th:text="${voteItem.disagreeCount}">0</td>
 				<td th:text="${#temporals.format(voteItem.votingStart, 'yyyy-MM-dd')}">開始日</td>
 				<td th:text="${#temporals.format(voteItem.votingEnd, 'yyyy-MM-dd')}">終了日</td>
+				<td>
+					<!-- 投票期間が終了している場合、投票結果を表示 -->
+					<div th:if="${voteItem.votingEnd != null && voteItem.votingEnd.isBefore(today)}">
+						<p>賛成: <span th:text="${agreePercentages[voteItem.voteItemId]} + '%'"></span></p>
+						<p>反対: <span th:text="${disagreePercentages[voteItem.voteItemId]} + '%'"></span></p>
+					</div>
+					<div th:if="${voteItem.votingEnd == null || voteItem.votingEnd.isAfter(today)}">
+						<p>投票期間中</p>
+					</div>
+				</td>
 				<td>
 					<!-- 賛成・反対ボタン（他のユーザーの投稿にのみ表示） -->
 					<form th:action="@{/vote}" method="post">
