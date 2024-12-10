@@ -2,7 +2,9 @@ package com.example.app.controller;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -62,8 +64,6 @@ public class VoteItemController {
 			@RequestParam(value = "sortBy", defaultValue = "dateDesc") String sortBy,
 			@ModelAttribute("user") User user,
 			Model model) {
-		// セッションから取得したユーザー情報を自動的にモデルに追加
-		//User user = (User) model.getAttribute("user");
 
 		//全ての投票を取得（並び替え条件に応じて）
 		List<VoteItem> voteItems = new ArrayList<>();
@@ -79,15 +79,43 @@ public class VoteItemController {
 			voteItems = voteItemmapper.selectAllOrderByDateDesc();
 			break;
 		}
+		
+    // 投票アイテムに投票結果を％で表示
+    LocalDateTime today = LocalDateTime.now();
+    Map<Integer, Double> agreePercentages = new HashMap<>();
+    Map<Integer, Double> disagreePercentages = new HashMap<>();
+    
+    for (VoteItem voteItem : voteItems) {
+        if (voteItem.getVotingEnd() != null && voteItem.getVotingEnd().isBefore(today)) {
+            // 投票期間が過ぎた投稿は、投票結果を計算
+            Integer agreeCount = voteItemmapper.getAgreeCount(voteItem.getVoteItemId());
+            Integer disagreeCount = voteItemmapper.getDisagreeCount(voteItem.getVoteItemId());
+            Integer totalVotes = agreeCount + disagreeCount;
+
+            // 投票数が0じゃなければ％を計算
+            if (totalVotes > 0) {
+                double agreePercentage = (double) agreeCount / totalVotes * 100;
+                double disagreePercentage = (double) disagreeCount / totalVotes * 100;
+
+                // 結果をMapに保存
+                agreePercentages.put(voteItem.getVoteItemId(), agreePercentage);
+                disagreePercentages.put(voteItem.getVoteItemId(), disagreePercentage);
+            }
+        }
+    }
 
 		// 投票アイテムのリストをビューに渡す
 		model.addAttribute("voteItems", voteItems);
+		
+    // 投票結果（agreePercentage、disagreePercentage）をモデルに追加
+    model.addAttribute("agreePercentages", agreePercentages);
+    model.addAttribute("disagreePercentages", disagreePercentages);
 
 		//新規投票作成用フォーム
 		model.addAttribute("voteItem", new VoteItem());
 
 		//投票期間が終了したかを判定、モデルに情報を渡す
-		LocalDateTime today = LocalDateTime.now();
+		//LocalDateTime today = LocalDateTime.now();
 		model.addAttribute("today", today);
 
 		//プルダウンの選択状態を保持
