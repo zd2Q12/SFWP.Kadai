@@ -77,6 +77,16 @@
 <select id="selectByUserId" resultType="VoteItem">
     SELECT * FROM vote_items WHERE created_by = #{userId}
 </select>
-	
-
+	<!-- 賛成票数を取得 -->
+<select id="getAgreeCount" resultType="Integer">
+select count(*) from vote_results
+where vote_item_id = #{voteItemId}
+and vote_value = 1
+</select>
+	<!-- 反対票数を取得 -->
+<select id="getDisagreeCount" resultType="Integer">
+select count(*) from vote_results
+where vote_item_id = #{voteItemId}
+and vote_value = -1
+</select>
 </mapper>
