@@ -153,23 +153,28 @@ System.out.println("ログインユーザー：" + loggedInUser.getUserName());
 	// 削除確認画面への遷移（新規追加）
 	@GetMapping("/delete/{voteItemId}")
 	public String deleteVoteItemConfirmation(@PathVariable Integer voteItemId, Model model) {
-		System.out.println("削除する投稿の取得：" + voteItemId);
 		// 対象の投票アイテムを取得
 		VoteItem voteItem = voteItemmapper.getVoteItemById(voteItemId);
 		if(voteItem == null) {
 			System.out.println("投稿が見つかりません：" + voteItemId);
 			return "home";
 		}
+		//削除するvoteItemの行を全て取り出し、nullの箇所を調べる↓
+		//voteItemIdがnullだったのでSQLクエリを確認したら、getVoteItemByIdにvoteItemIdを
+		//取得するクエリが存在しなかった。-＞1週間程悩んでいたことを、質問したら5分で解決
+		System.out.println("voteItem->"+voteItem);
 		model.addAttribute("voteItem", voteItem);
+		System.out.println("削除する投稿の取得：" + voteItemId);
 		return "deleteVoteItem"; // 削除確認用のビュー
 	}
 
 	// 削除処理（新規追加）
 	@PostMapping("/delete/{voteItemId}")
-	public String deleteVoteItem(@PathVariable Integer voteItemId) {
+	public String deleteVoteItem(@PathVariable Integer voteItemId,
+			RedirectAttributes rd) {
 		System.out.println("削除完了する投稿の取得：" + voteItemId);
-    VoteItem voteItem = voteItemmapper.getVoteItemById(voteItemId);
-    System.out.println("取得した投票アイテム：" + voteItem); // 確認用ログ
+		voteItemmapper.deleteVoteItem(voteItemId);
+		rd.addFlashAttribute("statusMessage", "投稿を削除しました。");
 		return "redirect:/home"; // 削除後はホームにリダイレクト
 	}
 
