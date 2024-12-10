@@ -38,4 +38,9 @@ public interface VoteItemMapper {
 	
   // 追加：ユーザーが特定の投票アイテムに投票した結果を取得する
   VoteResult findVoteResultByUserIdAndVoteItemId(@Param("voteItemId") Integer voteItemId, @Param("userId") Integer userId);
+  
+  //賛成票数を取得
+  Integer getAgreeCount(int voteItemId);
+  //反対票数を取得
+  Integer getDisagreeCount(int voteItemId);
 }
