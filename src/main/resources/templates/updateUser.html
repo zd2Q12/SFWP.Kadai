@@ -4,50 +4,121 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Insert title here</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+	<style>
+		body {
+			font-family: Arial, Helvetica, sans-serif;
+			background-color: #f4f7fc;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 100vh;
+		}
+		.container{
+			max-width: 600px;
+			background-color: white;
+			padding: 30px;
+			border-radius: 8px;
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+		}
+		
+		h2{
+			text-align: center;
+			color: #333;
+		}
+		.error{
+			color: #d9534f;
+			font-size: 0.9rem;
+		}
+		 .form-group{
+			 margin-bottom: 15px;
+		 }
+		  .form-control, textarea{
+			  border-radius: 4px;
+		  }
+		  
+        .btn-custom{
+			width: 100%;
+			background-color: #007bff;
+			color: white;
+			border: none;
+			padding: 10px;
+			border-radius: 4px;
+			font-size: 1.1rem;
+		}
+		 .btn-custom:hover {
+			 background-color: #0056b3;
+		 }
+		  .delete-btn{
+			  width: 100%;
+			  background-color: #dc3545;
+			  color: white;
+			  border: none;
+			padding: 10px;
+			border-radius: 4px;
+			font-size: 1.1rem;
+			margin-top: 10px;
+		  }
+		  
+        .delete-btn:hover{
+			background-color: #c82333;
+		}
+		 .register-link{
+			 display: block;
+			 text-align: center;
+			 margin-top: 20px;
+		 }
+	</style>
 </head>
 
 <body>
-	<h2>ユーザー情報更新</h2>
+	<div class="container">
+		<h2>ユーザー情報更新</h2>
 
-	<!-- エラーメッセージ -->
-	<div th:if="${message != null}">
-		<p th:text="${message}"></p>
+		<!-- エラーメッセージ -->
+		<div th:if="${message != null}">
+			<p th:text="${message}" class="alert alert-info"></p>
+		</div>
+
+		<form action="" method="post" th:object="${user}">
+			<input type="hidden" th:field="*{userId}">
+
+			<div class="form-group">
+				<label for="userName">ユーザー名：</label>
+				<input type="text" class="form-control" th:field="*{userName}">
+				<p class="error" th:errors="*{userName}"></p>
+			</div>
+
+			<div class="form-group">
+				<label for="password">新しいパスワード：</label>
+				<input type="password" class="form-control" th:field="*{password}">
+				<p class="error" th:errors="*{password}"></p>
+			</div>
+			<div class="form-group">
+				<label for="email">メールアドレス：</label>
+				<input type="email" class="form-control" th:field="*{email}">
+				<p class="error" th:errors="*{email}"></p>
+			</div>
+
+			<div class="form-group">
+				<label for="birthday">誕生日：</label>
+				<input type="date" class="form-control" th:field="*{birthday}">
+				<p class="error" th:errors="*{birthday}"></p>
+			</div>
+			<div class="form-group">
+				<label for="memo">メモ：</label>
+				<textarea class="form-control" th:field="*{memo}" cols="30" rows="10"></textarea>
+			</div>
+			<!--更新ボタン-->
+			<button type="submit" name="action" value="update" class="btn-custom">更新</button>
+			<!--削除ボタン-->
+			<button type="submit" id="deleteButton" name="action" value="delete" class="delete-btn"
+				onclick="return confirmDelete()">削除</button>
+		</form>
+		
+		<a class="register-link" th:href="@{/home}">戻る</a>
 	</div>
-
-	<form action="" method="post" th:object="${user}">
-		<input type="hidden" th:field="*{userId}">
-		<p class="error" th:errors="*{userName}"></p>
-		<p><label for="userName">ユーザー名：</label>
-			<input type="text" th:field="*{userName}">
-		</p>
-		<p class="error" th:errors="*{password}"></p>
-
-		<p>
-			<label for="password">新しいパスワード：</label>
-			<input type="password" th:field="*{password}">
-		</p>
-		<p class="error" th:errors="*{email}"></p>
-		<p>
-			<label for="email">メールアドレス：</label>
-			<input type="email" th:field="*{email}">
-		</p>
-		<p class="error" th:errors="*{birthday}"></p>
-		<p>
-			<label for="birthday">誕生日：</label>
-			<input type="date" th:field="*{birthday}">
-		</p>
-		<p>
-			<label for="memo">メモ：</label>
-			<textarea th:field="*{memo}" cols="30" rows="10"></textarea>
-		</p>
-		<!--更新ボタン-->
-		<button type="submit" name="action" value="update">更新</button>
-		<!--削除ボタン-->
-		<button type="submit" id="deleteButton" name="action" value="delete"
-			onclick="return confirmDelete()">削除</button>
-	</form>
-	<a th:href="@{/home}">戻る</a>
-
 	<!--削除確認のポップ-->
 	<script>
 		function confirmDelete() {
@@ -67,7 +138,8 @@
 		}
 	</script>
 	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 </body>
