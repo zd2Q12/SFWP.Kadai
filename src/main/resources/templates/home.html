@@ -96,8 +96,8 @@
 					<td>
 						<!-- 投票期間が終了している場合、投票結果を表示 -->
 						<div th:if="${voteItem.votingEnd != null && voteItem.votingEnd.isBefore(today)}">
-							<p>賛成: <span th:text="${agreePercentages[voteItem.voteItemId]} + '%'"></span></p>
-							<p>反対: <span th:text="${disagreePercentages[voteItem.voteItemId]} + '%'"></span></p>
+							<p>Yes: <span th:text="${agreePercentages[voteItem.voteItemId]} + '%'"></span></p>
+							<p>No: <span th:text="${disagreePercentages[voteItem.voteItemId]} + '%'"></span></p>
 						</div>
 						<div th:if="${voteItem.votingEnd == null || voteItem.votingEnd.isAfter(today)}">
 							<p>投票期間中</p>
@@ -109,14 +109,14 @@
 							<input type="hidden" name="voteItemId" th:value="${voteItem.voteItemId}">
 							<input type="hidden" name="voteValue" value="1"> <!-- 賛成にセット -->
 							<button type="submit" class="btn btn-success btn-vote"
-								th:disabled="${voteItem.votingStart.isAfter(today) || voteItem.votingEnd.isBefore(today)}">賛成</button>
+								th:disabled="${voteItem.votingStart.isAfter(today) || voteItem.votingEnd.isBefore(today)}">Yes</button>
 						</form>
 
 						<form th:action="@{/vote}" method="post" class="vote-form">
 							<input type="hidden" name="voteItemId" th:value="${voteItem.voteItemId}">
 							<input type="hidden" name="voteValue" value="-1"> <!-- 反対にセット -->
 							<button type="submit" class="btn btn-danger btn-vote"
-								th:disabled="${voteItem.votingStart.isAfter(today) || voteItem.votingEnd.isBefore(today)}">反対</button>
+								th:disabled="${voteItem.votingStart.isAfter(today) || voteItem.votingEnd.isBefore(today)}">No</button>
 						</form>
 					</td>
 					<!-- 削除ボタン：削除確認ページへ遷移 -->
